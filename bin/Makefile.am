@@ -19,7 +19,18 @@ atlas_scripts_SCRIPTS = \
                         config.sh \
                         reginit.sh \
                         resolvconf
+if PROBE_TYPE_V3
+atlas_scripts_SCRIPTS += arch/openwrt/openwrt-common.sh
+endif
 
+if PROBE_TYPE_V4
+atlas_scripts_SCRIPTS += arch/openwrt/openwrt-common.sh
+endif
+
+if PROBE_TYPE_V5
+atlas_scripts_SCRIPTS += arch/openwrt/openwrt-common.sh
+
+endif
 CLEANFILES = \
              paths.lib.sh \
              common.sh \

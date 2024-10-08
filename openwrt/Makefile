@@ -49,7 +49,6 @@ define Build/Prepare
 	$(CP) $(patsubst %/openwrt,%,$(TOPDIR)/$(SOURCE))/. $(PKG_BUILD_DIR)
 endef
 
-
 define Package/ripe-atlas-common
 	$(call Package/ripe-atlas/Default)
 	TITLE+=(common files)
@@ -145,6 +144,12 @@ define Package/ripe-atlas-common/install
 			resolvconf \
 			support.lib.sh, \
 			$(PKG_INSTALL_DIR)/usr/lib/ripe-atlas/scripts/$(script))
+ifneq ($(PRB_TYPE),generic)
+	$(INSTALL_BIN) -t \
+		$(1)/usr/lib/ripe-atlas/scripts \
+		openwrt-common.sh \
+		$(PKG_INSTALL_DIR)/usr/lib/ripe-atlas/scripts/openwrt-common.sh
+endif
 	$(INSTALL_BIN) \
 		$(PKG_INSTALL_DIR)/usr/lib/ripe-atlas/measurement/busybox \
 		$(1)/usr/lib/ripe-atlas/measurement/busybox
