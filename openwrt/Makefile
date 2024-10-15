@@ -54,7 +54,6 @@ define Package/ripe-atlas-common
 	TITLE+=(common files)
 	USERID:=$(ATLAS_USER):$(ATLAS_GROUP) $(ATLAS_MEAS):$(ATLAS_GROUP)
 	DEPENDS+= \
-                  +e2fsprogs \
                   +jsonfilter \
                   +openssh-client \
                   +openssh-keygen \
@@ -66,6 +65,7 @@ define Package/ripe-atlas-common
 	          +@BUSYBOX_CONFIG_PS \
 	          +@BUSYBOX_CONFIG_SED \
 	          +@BUSYBOX_CONFIG_TAR \
+	          +@BUSYBOX_CONFIG_TEE \
                   +!PACKAGE_ntpd:chrony \
 		  +!BUSYBOX_CONFIG_BUNZIP2:bzip2
 	CONFLICTS:=atlasmsm \
