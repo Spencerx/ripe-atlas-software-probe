@@ -86,6 +86,10 @@ define Package/ripe-atlas-common/conffiles
 /etc/ripe-atlas/mode
 endef
 
+define Package/ripe-atlas-common/config
+	source "$(SOURCE)/Config.in"
+endef
+
 define Package/ripe-atlas-common/description
 RIPE Atlas (common files)
 
@@ -199,10 +203,6 @@ define Package/ripe-atlas-probe
 	MENU:=1
 endef
 
-define Package/ripe-atlas-probe/config
-	source "$(SOURCE)/Config.in"
-endef
-
 define Package/ripe-atlas-probe/description
 RIPE Atlas (Software Probe)
 
@@ -234,10 +234,6 @@ define Package/ripe-atlas-anchor
 	VARIANT:=anchor
 	PROVIDES+=ripe-atlas-probe
 	MENU:=1
-endef
-
-define Package/ripe-atlas-anchor/config
-	source "$(SOURCE)/Config.in"
 endef
 
 define Package/ripe-atlas-anchor/description
