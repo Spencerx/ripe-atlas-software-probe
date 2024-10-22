@@ -79,6 +79,7 @@ start_instance()
 {
 	local cfg=${IPKG_INSTROOT}/etc/ripe-atlas/config.txt
 	local mod=${IPKG_INSTROOT}/etc/ripe-atlas/mode
+	local oldmode
 
 	if [ ${2} -ne 0 ]; then
 		echo 'validation failed'
@@ -103,13 +104,21 @@ start_instance()
 
 	echo 'Starting RIPE Atlas'
 	setup_environment
-	echo 1>/dev/null 2> "${mod}"
-	echo 1>/dev/null 2> "${cfg}"
 
-	if [ ${rxtx_report} -ne 0 ]; then
-		echo 'RXTXRPT=yes' >> "${cfg}"
+	. "${cfg}"
+	if ( ( [ ${rxtx_report} -ne 0 ] && [ "${RXTXRPT}" != 'yes' ] ) ||
+	     ( [ ${rxtx_report} -eq 0 ] && [ "${RXTXRPT}" = 'yes' ] ) ); then
+		if [ ${rxtx_report} -ne 0 ]; then
+			echo 'RXTXRPT=yes' > "${cfg}"
+		else
+			echo 1>/dev/null 2> "${cfg}"
+		fi
 	fi
-	echo "${mode}" > "${mod}"
+
+	oldmode=$(cat "${mod}" 2>/dev/null)
+	if [ "${oldmode}" != "${mode}" ]; then
+		echo "${mode}" > "${mod}"
+	fi
 
 	procd_open_instance
 	procd_set_param command ${IPKG_INSTROOT}/usr/sbin/ripe-atlas
