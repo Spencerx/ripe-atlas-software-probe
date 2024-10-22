@@ -89,7 +89,6 @@ start_instance()
 		return 1
 	fi
 
-	rm -f ${IPKG_INSTROOT}/etc/ripe-atlas/reg_servers.sh
 	case "${mode}" in
 		test|dev|prod)
 			;;
@@ -97,6 +96,10 @@ start_instance()
 			return 1
 			;;
 	esac
+	if cmp -s ${IPKG_INSTROOT}/etc/ripe-atlas/reg_servers.sh \
+	          ${IPKG_INSTROOT}/usr/lib/ripe-atlas/scripts/reg_servers.sh.${mode}; then
+		rm -f ${IPKG_INSTROOT}/etc/ripe-atlas/reg_servers.sh
+	fi
 
 	echo 'Starting RIPE Atlas'
 	setup_environment
