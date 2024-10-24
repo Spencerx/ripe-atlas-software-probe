@@ -7,24 +7,20 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign])
 AM_SILENT_RULES([yes])
 
-# use the following arguments for '--with-probe-type' flag
-# v3: openwrt-atlas-probev3
-# v4: openwrt-atlas-probev4
-# v5: openwrt-atlas-probev5
-# centos: centos-rpm-<PACKAGE_NAME>-<PACKAGE_VERSION>-<PACKAGE_RELEASE>  (ie. centos-rpm-ripe-atlas-probe-5090-1.el7)
-# debian: debian-<PACKAGE_NAME>-<VERSION>  (ie. debian-ripe-atlas-probe-5090)
-AC_ARG_WITH([probe-type], [AS_HELP_STRING([--with-probe-type], [define which probe flavour should be built (v3,v4,v5)])], [], [with_probe_type=no])
-
-probe_type=${with_probe_type}
-AC_SUBST(probe_type)
-
-AS_CASE([$probe_type],
-	[*openwrt*], [probe_scripts_path=$probe_type],
-	[probe_scripts_path=generic])
+AC_ARG_ENABLE([hwprobe],
+	      [AS_HELP_STRING([--enable-hwprobe], [configure build specific for hardware probes @<:@default=no@:>@])],
+	      [case "${enableval}" in
+			yes) do_hwprobe=true ;;
+			no) do_hwprobe=false ;;
+		     *) AC_MSG_ERROR([bad value ${enableval} for --enable-hwprobe]) ;;
+	     esac],[do_hwprobe=false])
+AM_CONDITIONAL([PROBE_TYPE_HW], [test "x${do_hwprobe}" = 'xtrue'])
+if test "x${do_hwprobe}" = 'xtrue'; then
+	probe_scripts_path=openwrt-hwprobe
+else
+	probe_scripts_path=generic
+fi
 AC_SUBST(probe_scripts_path)
-AM_CONDITIONAL([PROBE_TYPE_V3], [test "x${probe_type}" = 'xopenwrt-atlas-probev3'])
-AM_CONDITIONAL([PROBE_TYPE_V4], [test "x${probe_type}" = 'xopenwrt-atlas-probev4'])
-AM_CONDITIONAL([PROBE_TYPE_V5], [test "x${probe_type}" = 'xopenwrt-atlas-probev5'])
 
 AC_ARG_ENABLE([chown],
 	      [AS_HELP_STRING([--enable-chown], [set permissions during install @<:@default=yes@:>@])],

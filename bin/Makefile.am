@@ -4,9 +4,9 @@ sbin_SCRIPTS = \
                ripe-atlas
 
 atlas_scripts_SCRIPTS = \
-                        arch/$(probe_scripts_path)/$(probe_scripts_path)-ATLAS.sh \
-                        arch/$(probe_scripts_path)/$(probe_scripts_path)-common.sh \
-                        arch/$(probe_scripts_path)/$(probe_scripts_path)-reginit.sh \
+                        arch/generic/generic-ATLAS.sh \
+                        arch/generic/generic-common.sh \
+                        arch/generic/generic-reginit.sh \
                         arch/linux/linux-functions.sh \
                         array.lib.sh \
                         atlas_log.lib.sh \
@@ -19,18 +19,14 @@ atlas_scripts_SCRIPTS = \
                         config.sh \
                         reginit.sh \
                         resolvconf
-if PROBE_TYPE_V3
-atlas_scripts_SCRIPTS += arch/openwrt/openwrt-common.sh
+
+if PROBE_TYPE_HW
+atlas_scripts_SCRIPTS += \
+                        arch/openwrt-hwprobe/openwrt-hwprobe-ATLAS.sh \
+                        arch/openwrt-hwprobe/openwrt-hwprobe-common.sh \
+                        arch/openwrt-hwprobe/openwrt-hwprobe-reginit.sh
 endif
 
-if PROBE_TYPE_V4
-atlas_scripts_SCRIPTS += arch/openwrt/openwrt-common.sh
-endif
-
-if PROBE_TYPE_V5
-atlas_scripts_SCRIPTS += arch/openwrt/openwrt-common.sh
-
-endif
 CLEANFILES = \
              paths.lib.sh \
              common.sh \
