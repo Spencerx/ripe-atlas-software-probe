@@ -1,3 +1,4 @@
 config/probe/known_hosts.reg		usr/share/ripe-atlas/
 config/probe/reg_servers.sh.prod	usr/libexec/ripe-atlas/scripts/
 config/common/ripe-atlas.service	usr/lib/systemd/system/
+bin/config.sh				usr/libexec/ripe-atlas/scripts/

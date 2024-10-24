@@ -101,6 +101,7 @@ mkdir -p %{buildroot}%{_libexecdir}/%{base_path}/scripts
 install -m 0755 %{_builddir}/%{build_dirname}/config/common/reg_servers.sh.dev %{buildroot}%{_libexecdir}/%{base_path}/scripts/reg_servers.sh.dev
 install -m 0755 %{_builddir}/%{build_dirname}/config/common/reg_servers.sh.test %{buildroot}%{_libexecdir}/%{base_path}/scripts/reg_servers.sh.test
 install -m 0755 %{_builddir}/%{build_dirname}/config/anchor/reg_servers.sh.prod %{buildroot}%{_libexecdir}/%{base_path}/scripts/reg_servers.sh.prod
+install -m 0755 %{_builddir}/%{build_dirname}/bin/config.sh %{buildroot}%{_libexecdir}/%{base_path}/scripts/config.sh
 mkdir -p %{buildroot}%{atlas_newdir}
 mkdir -p %{buildroot}%{_unitdir}
 install -m 0644 %{_builddir}/%{build_dirname}/config/common/%{service_name} %{buildroot}%{_unitdir}/%{service_name}
@@ -110,6 +111,7 @@ touch %{buildroot}%{atlas_newdir}/reg_servers.sh
 %{_datadir}/%{base_path}/known_hosts.reg
 %{_unitdir}/%{service_name}
 %{_libexecdir}/%{base_path}/scripts/reg_servers.sh.*
+%{_libexecdir}/%{base_path}/scripts/config.sh
 %ghost %attr(0755, %{atlas_user}, %{atlas_group}) %{atlas_newdir}/reg_servers.sh
 
 %define get_state() [ -f "%{rpm_statedir}/%1" ]
