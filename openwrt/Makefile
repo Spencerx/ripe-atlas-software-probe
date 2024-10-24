@@ -8,14 +8,52 @@ PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=RIPE Atlas Team <atlas@ripe.net>
 PKG_FIXUP=autoreconf
 PKG_INSTALL:=1
-PRB_TYPE:=$(if $(CONFIG_RIPE_ATLAS_PROBE_TYPE_V3),openwrt-atlas-probev3,$(if $(CONFIG_RIPE_ATLAS_PROBE_TYPE_V4),openwrt-atlas-probev4,$(if $(CONFIG_RIPE_ATLAS_PROBE_TYPE_V5),openwrt-atlas-probev5,generic)))
+
+include $(INCLUDE_DIR)/package.mk
+
+########### VARIABLES ###########
 
 ATLAS_USER=ripe-atlas
 ATLAS_GROUP=ripe-atlas
 ATLAS_MEAS=ripe-atlas-measurement
-PROBE_FW_KEYS=
 
-include $(INCLUDE_DIR)/package.mk
+# HWProbe V3
+PROBE_FW_KEYS = \
+	2017-11-07-dev.pem \
+	2017-11-07-prod.pem \
+	2017-11-07-test.pem
+
+# HWProbe V4
+PROBE_FW_KEYS += \
+	2018-04-23-dev.pem \
+	2018-04-23-prod.pem \
+	2018-04-23-test.pem
+
+# HWProbe V5
+PROBE_FW_KEYS += \
+	2021-02-02-dev.pem \
+	2021-02-02-prod.pem \
+	2021-02-02-test.pem
+
+CONFIGURE_ARGS+= \
+	--with-user=$(ATLAS_USER) \
+	--with-group=$(ATLAS_GROUP) \
+	--with-measurement-user=$(ATLAS_MEAS) \
+	--disable-systemd \
+	--disable-setcap-install \
+	--disable-chown
+
+########### GENERIC ###########
+
+define Build/Prepare
+	$(CP) $(patsubst %/openwrt,%,$(TOPDIR)/$(SOURCE))/. $(PKG_BUILD_DIR)
+endef
+
+define LinkApplet
+	$(LN) busybox $(1)/usr/lib/ripe-atlas/measurement/$(2)
+endef
+
+########### DEFAULTS ###########
 
 define Package/ripe-atlas/Default
 	TITLE:=RIPE Atlas
@@ -24,30 +62,7 @@ define Package/ripe-atlas/Default
 	URL:=https://atlas.ripe.net/
 endef
 
-CONFIGURE_ARGS+= \
-	--with-probe-type=$(PRB_TYPE) \
-	--with-user=$(ATLAS_USER) \
-	--with-group=$(ATLAS_GROUP) \
-	--with-measurement-user=$(ATLAS_MEAS) \
-	--disable-systemd \
-	--disable-setcap-install \
-	--disable-chown
-
-define Package/ripe-atlas/Default/description
-RIPE Atlas is the RIPE NCC's main Internet data
-collection system. It is a global network of
-devices, called probes and anchors, that
-actively measure Internet connectivity. Anyone
-can access this data via Internet traffic maps,
-streaming data visualisations, and an API.
-RIPE Atlas users can also perform customised
-measurements to gain valuable data about their
-own networks.
-endef
-
-define Build/Prepare
-	$(CP) $(patsubst %/openwrt,%,$(TOPDIR)/$(SOURCE))/. $(PKG_BUILD_DIR)
-endef
+########### COMMON PKG ###########
 
 define Package/ripe-atlas-common
 	$(call Package/ripe-atlas/Default)
@@ -75,49 +90,19 @@ define Package/ripe-atlas-common
 	           atlas_extra_v5 \
 	           atlas-sw-probe \
 	           atlas-sw-probe-rpc
-
-ifneq ($(CONFIG_RIPE_ATLAS_PROBE_TYPE_V5),)
-	DEPENDS+= \
-	          +btrfs
-endif
 endef
 
 define Package/ripe-atlas-common/conffiles
 /etc/ripe-atlas/mode
 endef
 
-define Package/ripe-atlas-common/config
-	source "$(SOURCE)/Config.in"
-endef
-
 define Package/ripe-atlas-common/description
 RIPE Atlas (common files)
 
-$(call Package/ripe-atlas/Default/description)
+Essential core assets used in all probe flavours.
+This package must be installed for a probe to operate
+as expected.
 endef
-
-define LinkApplet
-	$(LN) busybox $(1)/usr/lib/ripe-atlas/measurement/$(2)
-endef
-
-ifneq ($(CONFIG_RIPE_ATLAS_PROBE_TYPE_V3),)
-	PROBE_FW_KEYS += \
-		2017-11-07-dev.pem \
-		2017-11-07-prod.pem \
-		2017-11-07-test.pem
-endif
-ifneq ($(CONFIG_RIPE_ATLAS_PROBE_TYPE_V4),)
-	PROBE_FW_KEYS += \
-		2018-04-23-dev.pem \
-		2018-04-23-prod.pem \
-		2018-04-23-test.pem
-endif
-ifneq ($(CONFIG_RIPE_ATLAS_PROBE_TYPE_V5),)
-	PROBE_FW_KEYS += \
-		2021-02-02-dev.pem \
-		2021-02-02-prod.pem \
-		2021-02-02-test.pem
-endif
 
 define Package/ripe-atlas-common/install
 	$(INSTALL_DIR) \
@@ -135,10 +120,9 @@ define Package/ripe-atlas-common/install
 			class.lib.sh \
 			common-pre.sh \
 			common.sh \
-			config.sh \
-			$(PRB_TYPE)-ATLAS.sh \
-			$(PRB_TYPE)-common.sh \
-			$(PRB_TYPE)-reginit.sh \
+			generic-ATLAS.sh \
+			generic-common.sh \
+			generic-reginit.sh \
 			json.lib.sh \
 			linux-functions.sh \
 			paths.lib.sh \
@@ -148,12 +132,6 @@ define Package/ripe-atlas-common/install
 			resolvconf \
 			support.lib.sh, \
 			$(PKG_INSTALL_DIR)/usr/lib/ripe-atlas/scripts/$(script))
-ifneq ($(PRB_TYPE),generic)
-	$(INSTALL_BIN) -t \
-		$(1)/usr/lib/ripe-atlas/scripts \
-		openwrt-common.sh \
-		$(PKG_INSTALL_DIR)/usr/lib/ripe-atlas/scripts/openwrt-common.sh
-endif
 	$(INSTALL_BIN) \
 		$(PKG_INSTALL_DIR)/usr/lib/ripe-atlas/measurement/busybox \
 		$(1)/usr/lib/ripe-atlas/measurement/busybox
@@ -164,9 +142,13 @@ endif
 		$(1)/usr/share/ripe-atlas \
 		$(foreach file, \
 			FIRMWARE_APPS_VERSION \
-			measurement.conf \
-			$(PROBE_FW_KEYS), \
+			measurement.conf, \
 			$(PKG_INSTALL_DIR)/usr/share/ripe-atlas/$(file))
+	$(INSTALL_DATA) -t \
+		$(1)/usr/share/ripe-atlas \
+		$(foreach file, \
+			$(PROBE_FW_KEYS), \
+			$(PKG_BUILD_DIR)/config/probe/$(file))
 	$(INSTALL_BIN) files/ripe-atlas.init $(1)/etc/init.d/ripe-atlas
 	$(INSTALL_BIN) files/ripe-atlas.uci-defaults $(1)/etc/uci-defaults/60_ripe-atlas
 	$(INSTALL_DATA) files/capabilities.json $(1)/usr/share/ripe-atlas/capabilities.json
@@ -194,19 +176,23 @@ endif
 	$(call LinkApplet,$(1),telnetd)
 endef
 
+########### SOFTWARE PROBE ###########
+
 define Package/ripe-atlas-probe
 	$(call Package/ripe-atlas/Default)
 	TITLE+=(Software Probe)
 	DEPENDS+=+ripe-atlas-common
-	VARIANT:=probe
-	CONFLICTS+=ripe-atlas-anchor
 	MENU:=1
 endef
 
 define Package/ripe-atlas-probe/description
 RIPE Atlas (Software Probe)
 
-$(call Package/ripe-atlas/Default/description)
+Probe specific files and configurations that
+form a working software probe.
+
+Please visit https://atlas.ripe.net/apply/swprobe/
+to register.
 endef
 
 define Package/ripe-atlas-probe/install
@@ -219,6 +205,9 @@ define Package/ripe-atlas-probe/install
 	$(INSTALL_BIN) \
 		$(PKG_BUILD_DIR)/config/probe/reg_servers.sh.prod \
 		$(1)/usr/lib/ripe-atlas/scripts
+	$(INSTALL_BIN) \
+		$(PKG_BUILD_DIR)/bin/config.sh \
+		$(1)/usr/lib/ripe-atlas/scripts
 endef
 
 define Package/ripe-atlas-probe/conffiles
@@ -227,11 +216,49 @@ define Package/ripe-atlas-probe/conffiles
 /etc/config/ripe-atlas
 endef
 
+########### HARDWARE PROBE ###########
+
+define Package/ripe-atlas-hwprobe
+	$(call Package/ripe-atlas/Default)
+	TITLE+=(Hardware Probe)
+	DEPENDS+=+ripe-atlas-common
+	PROVIDES+=ripe-atlas-probe
+	MENU:=1
+endef
+
+define Package/ripe-atlas-hwprobe/description
+RIPE Atlas (Hardware Probe)
+
+Probe specific files and configurations that
+form a working hardware probe.
+
+Only install at the direction of RIPE NCC.
+endef
+
+define Package/ripe-atlas-hwprobe/install
+	$(call Package/ripe-atlas-probe/install,$(1))
+	$(INSTALL_BIN) -t \
+		$(1)/usr/lib/ripe-atlas/scripts/ \
+		$(foreach file, \
+			openwrt-hwprobe-common.sh \
+			openwrt-hwprobe-reginit.sh \
+			openwrt-hwprobe-ATLAS.sh, \
+			$(PKG_BUILD_DIR)/bin/arch/openwrt-hwprobe/$(file))
+
+	$(SED) '1{s|=generic|=openwrt-hwprobe|}' \
+		$(1)/usr/lib/ripe-atlas/scripts/config.sh
+endef
+
+define Package/ripe-atlas-hwprobe/conffiles
+	$(call Package/ripe-atlas-probe/conffiles)
+endef
+
+########### ANCHOR ###########
+
 define Package/ripe-atlas-anchor
 	$(call Package/ripe-atlas/Default)
 	TITLE+=(Anchor)
 	DEPENDS+=+ripe-atlas-common
-	VARIANT:=anchor
 	PROVIDES+=ripe-atlas-probe
 	MENU:=1
 endef
@@ -239,7 +266,10 @@ endef
 define Package/ripe-atlas-anchor/description
 RIPE Atlas (Anchor)
 
-$(call Package/ripe-atlas/Default/description)
+Probe specific files and configurations that form a working anchor.
+Please visit https://atlas.ripe.net/anchors/apply/ to register.
+
+Only install at the direction of RIPE NCC.
 endef
 
 define Package/ripe-atlas-anchor/install
@@ -252,6 +282,9 @@ define Package/ripe-atlas-anchor/install
 	$(INSTALL_BIN) \
 		$(PKG_BUILD_DIR)/config/anchor/reg_servers.sh.prod \
 		$(1)/usr/lib/ripe-atlas/scripts
+	$(INSTALL_BIN) \
+		$(PKG_BUILD_DIR)/bin/config.sh \
+		$(1)/usr/lib/ripe-atlas/scripts
 endef
 
 define Package/ripe-atlas-anchor/conffiles
@@ -260,6 +293,9 @@ define Package/ripe-atlas-anchor/conffiles
 /etc/config/ripe-atlas
 endef
 
+########### PACKAGES ###########
+
 $(eval $(call BuildPackage,ripe-atlas-common))
 $(eval $(call BuildPackage,ripe-atlas-anchor))
+$(eval $(call BuildPackage,ripe-atlas-hwprobe))
 $(eval $(call BuildPackage,ripe-atlas-probe))
