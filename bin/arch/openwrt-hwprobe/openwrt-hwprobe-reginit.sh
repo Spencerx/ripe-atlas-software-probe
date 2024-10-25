@@ -24,6 +24,8 @@ KEY_PREFIXES_test_v5=${ATLAS_DATADIR}/2021-02-02-test.pem
 KEY_PREFIXES_prod_v3=${ATLAS_DATADIR}/2017-11-07-prod.pem
 KEY_PREFIXES_prod_v4=${ATLAS_DATADIR}/2018-04-23-prod.pem
 KEY_PREFIXES_prod_v5=${ATLAS_DATADIR}/2021-02-02-prod.pem
+STATIC_V4_CMD=set_ipv4
+STATIC_V6_CMD=set_ipv6
 
 install_firmware()
 {
@@ -109,7 +111,7 @@ p_to_r_init()
 		answer="${answer} Product=$(_get_usb_prop ${usbid} product)"
 		answer="${answer}\n"
 	fi
-	answer="${answer}REASON_FOR_REGISTRATION ${reason}\n"
+	answer="${answer}\nREASON_FOR_REGISTRATION ${reason}\n"
 
 	echo -e "${answer}" | tee ${P_TO_R_INIT_IN}
 }
@@ -212,4 +214,13 @@ check_sig()
 	echo 'End of check_sig'
 
 	return 1
+}
+
+reboot_probe()
+{
+	# Misnomer. NEED_REBOOT is actually a request to reconfigure the network
+	if [ "${NEED_REBOOT}" != '1' ]; then
+		# memory error or similar
+		_wrt_syscall 'action=reboot'
+	fi
 }
