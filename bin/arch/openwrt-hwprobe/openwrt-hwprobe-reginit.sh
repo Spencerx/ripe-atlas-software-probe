@@ -2,9 +2,9 @@
 
 SSH_CMD=hwprobe_ssh
 SSH_CMD_EXEC=hwprobe_ssh_exec
-SSH_ARGS="-o 'ServerAliveInterval 60' \
-          -o 'StrictHostKeyChecking yes' \
-          -o 'UserKnownHostsFile $ATLAS_STATUS/known_hosts'"
+SSH_ARGS="-o ServerAliveInterval=60 \
+          -o StrictHostKeyChecking=yes \
+          -o UserKnownHostsFile=$ATLAS_STATUS/known_hosts"
 TRIGGER_MANUAL_UPGRADE_CMD=trigger_manual_upgrade
 CHECK_FOR_NEW_KERNEL_CMD=:
 DEV_FIRMWARE=/tmp/firmware.img
@@ -114,7 +114,7 @@ p_to_r_init()
 	echo -e "${answer}" | tee ${P_TO_R_INIT_IN}
 }
 
-ssh()
+hwprobe_ssh()
 {
 	local key_opt
 	if [ -f "${ATLAS_SYSCONFDIR}/probe_key" ]; then
@@ -122,10 +122,10 @@ ssh()
 	else
 		key_opt="-o 'PKCS11Provider /usr/lib/libmox-pkcs11.so'"
 	fi
-	/usr/bin/ssh ${SSH_ARGS} "${@}"
+	/usr/bin/ssh ${key_opt} ${SSH_ARGS} "${@}"
 }
 
-ssh_exec()
+hwprobe_ssh_exec()
 {
 	local key_opt
 	if [ -f "${ATLAS_SYSCONFDIR}/probe_key" ]; then
@@ -133,7 +133,7 @@ ssh_exec()
 	else
 		key_opt="-o 'PKCS11Provider /usr/lib/libmox-pkcs11.so'"
 	fi
-	exec /usr/bin/ssh ${SSH_ARGS} "${@}"
+	exec /usr/bin/ssh ${key_opt} ${SSH_ARGS} "${@}"
 }
 
 trigger_manual_upgrade()
