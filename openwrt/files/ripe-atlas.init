@@ -105,7 +105,10 @@ start_instance()
 	echo 'Starting RIPE Atlas'
 	setup_environment
 
-	. "${cfg}"
+	if [ -f "${cfg}" ]; then
+		. "${cfg}"
+	fi
+
 	if ( ( [ ${rxtx_report} -ne 0 ] && [ "${RXTXRPT}" != 'yes' ] ) ||
 	     ( [ ${rxtx_report} -eq 0 ] && [ "${RXTXRPT}" = 'yes' ] ) ); then
 		if [ ${rxtx_report} -ne 0 ]; then
