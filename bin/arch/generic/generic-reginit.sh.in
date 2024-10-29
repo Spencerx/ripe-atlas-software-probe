@@ -30,23 +30,6 @@ fi
 . $ATLAS_SCRIPTS/$DEVICE_NAME-common.sh
 . $ATLAS_SCRIPTS/linux-functions.sh
 
-get_arch()
-{
-	echo "fluffy"
-}
-
-get_sub_arch()
-{
-	local ID='generic'
-	local VERSION_ID='unknown'
-	local ARCH=$(uname -m)
-
-	if [ -r '/etc/os-release' ]; then
-		. /etc/os-release
-	fi
-	echo "${ID}/${VERSION_ID}/${ARCH}"
-}
-
 p_to_r_init()
 {
 	{

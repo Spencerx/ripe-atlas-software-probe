@@ -2,54 +2,51 @@ export PROBE_TYPE=@probe_scripts_path@
 
 get_arch()
 {
-	case $PROBE_TYPE in
+	local OPENWRT_ARCH='unknown'
 
-		*"v3"*)
-			. /lib/ar71xx.sh
-			ar71xx_board_name
+	if [ "${PROBE_TYPE}" != 'openwrt-hwprobe' ]; then
+		echo 'fluffy'
+		return
+	fi
+
+	if [ -r '/etc/os-release' ]; then
+		. /etc/os-release
+	fi
+
+	case "${OPENWRT_BOARD}" in
+		'ath79/tiny')
+			echo 'tl-mr3020'
 			;;
 
-#			sh /lib/ramips.sh
-#			sed < /tmp/sysinfo/board_name 's/tplink,//'
-#			;;
-
-		*"v4"*)
+		'sunxi/cortexa53')
 			echo 'nanopi-neo-plus2'
 			;;
 
-		*"v5"*)
+		'mvebu/cortexa53')
 			echo 'atlas-mox'
-			;;
-
-		*"rpm"*|*"deb"*|'generic')
-			echo 'fluffy'
 			;;
 
 		*)
 			echo 'unknown board'
-			exit 1
 			;;
 	esac
-
 }
 
 get_sub_arch()
 {
-	arch=`get_arch`
-	if [ "x$arch" = 'xfluffy' ]; then
-		echo "$PROBE_TYPE"
-	else
-		echo ""
+	local ID='generic'
+	local VERSION_ID='unknown'
+	local ARCH=$(uname -m)
+
+	if [ -r '/etc/os-release' ]; then
+		. /etc/os-release
 	fi
+	echo "${ID}/${VERSION_ID}/${ARCH}"
 }
 
 # DEVICE_NAME is used as a reference for which OS specific scripts should be invoked under 'bin/arch/'. The software probe has already been migrated to used the new 'generic' scripts, therefore for software probes the device name should be 'generic', otherwise it should be the autotools probe_type assigned during build. 
 SUB_ARCH=`get_sub_arch`
-if [ "$SUB_ARCH" != "" ]; then
-	DEVICE_NAME="generic"
-else
-	DEVICE_NAME=$PROBE_TYPE
-fi
+DEVICE_NAME="${PROBE_TYPE}"
 
 ATLAS_BASE=@atlas_datadir@
 ATLAS_STATIC=@atlas_libexecdir@
