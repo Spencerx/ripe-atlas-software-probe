@@ -89,7 +89,7 @@ set_ipv4()
 	mask=$(_ri_value IPV4NETMASK ${settings})
 	gw=$(_ri_value IPV4GATEWAY ${settings})
 	dns=$(_handle_dns '.')
-	if ( [ -z "${ip}" ] || [ -z "${mask}" ] || [ -z "${gw}" ] ); then
+	if ( [ "${mode}" != 'dhcp' ] && ( [ -z "${ip}" ] || [ -z "${mask}" ] || [ -z "${gw}" ] ) ); then
 		return
 	fi
 
@@ -115,7 +115,7 @@ set_ipv6()
 	len=$(_ri_value IPV6PREFIXLEN ${settings})
 	gw=$(_ri_value IPV6GATEWAY ${settings})
 	dns=$(_handle_dns ':')
-	if ( [ -z "${ip}" ] || [ -z "${len}" ] || [ -z "${gw}" ] ); then
+	if ( [ "${mode}" != 'dhcp' ] && ( [ -z "${ip}" ] || [ -z "${len}" ] || [ -z "${gw}" ] ) ); then
 		return
 	fi
 
