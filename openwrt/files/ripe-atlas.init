@@ -97,8 +97,10 @@ start_instance()
 			return 1
 			;;
 	esac
-	if cmp -s ${IPKG_INSTROOT}/etc/ripe-atlas/reg_servers.sh \
-	          ${IPKG_INSTROOT}/usr/lib/ripe-atlas/scripts/reg_servers.sh.${mode}; then
+
+	oldmode=$(cat "${mod}" 2>/dev/null)
+	if [ "${oldmode}" != "${mode}" ]; then
+		echo "${mode}" > "${mod}"
 		rm -f ${IPKG_INSTROOT}/etc/ripe-atlas/reg_servers.sh
 	fi
 
@@ -116,11 +118,6 @@ start_instance()
 		else
 			echo 1>/dev/null 2> "${cfg}"
 		fi
-	fi
-
-	oldmode=$(cat "${mod}" 2>/dev/null)
-	if [ "${oldmode}" != "${mode}" ]; then
-		echo "${mode}" > "${mod}"
 	fi
 
 	procd_open_instance

@@ -93,7 +93,7 @@ define Package/ripe-atlas-common
 endef
 
 define Package/ripe-atlas-common/conffiles
-/etc/ripe-atlas/mode
+/etc/config/ripe-atlas
 endef
 
 define Package/ripe-atlas-common/description
@@ -213,7 +213,6 @@ endef
 define Package/ripe-atlas-probe/conffiles
 /etc/ripe-atlas/probe_key
 /etc/ripe-atlas/probe_key.pub
-/etc/config/ripe-atlas
 endef
 
 ########### HARDWARE PROBE ###########
@@ -290,7 +289,6 @@ endef
 define Package/ripe-atlas-anchor/conffiles
 /etc/ripe-atlas/probe_key
 /etc/ripe-atlas/probe_key.pub
-/etc/config/ripe-atlas
 endef
 
 ########### PACKAGES ###########
