@@ -67,7 +67,7 @@ endef
 define Package/ripe-atlas-common
 	$(call Package/ripe-atlas/Default)
 	TITLE+=(common files)
-	USERID:=$(ATLAS_USER):$(ATLAS_GROUP) $(ATLAS_MEAS):$(ATLAS_GROUP)
+	USERID:=$(ATLAS_USER)=3333:$(ATLAS_GROUP)=3333 $(ATLAS_MEAS)=3334:$(ATLAS_GROUP)=3333
 	DEPENDS+= \
                   +jsonfilter \
                   +openssh-client \
