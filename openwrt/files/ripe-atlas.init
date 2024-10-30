@@ -98,14 +98,14 @@ start_instance()
 			;;
 	esac
 
+	echo 'Starting RIPE Atlas'
+	setup_environment
+
 	oldmode=$(cat "${mod}" 2>/dev/null)
 	if [ "${oldmode}" != "${mode}" ]; then
 		echo "${mode}" > "${mod}"
 		rm -f ${IPKG_INSTROOT}/etc/ripe-atlas/reg_servers.sh
 	fi
-
-	echo 'Starting RIPE Atlas'
-	setup_environment
 
 	if [ -f "${cfg}" ]; then
 		. "${cfg}"
