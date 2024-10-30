@@ -220,7 +220,9 @@ endef
 define Package/ripe-atlas-hwprobe
 	$(call Package/ripe-atlas/Default)
 	TITLE+=(Hardware Probe)
-	DEPENDS+=+ripe-atlas-common
+	DEPENDS+= \
+		+ripe-atlas-common \
+		+openssl-util
 	PROVIDES+=ripe-atlas-probe
 	MENU:=1
 endef
