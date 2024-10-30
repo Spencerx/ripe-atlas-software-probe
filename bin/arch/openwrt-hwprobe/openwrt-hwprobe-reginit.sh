@@ -94,7 +94,7 @@ p_to_r_init()
 	else
 		val='0'
 	fi
-	answer="${answer} ${val}"
+	answer="${answer} ${val} $(get_sub_arch)"
 
 	usbid=$(_get_usb_id ${blockdev})
 	if [ -n "${usbid}" ]; then
