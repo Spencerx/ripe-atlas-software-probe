@@ -1,6 +1,7 @@
 . $ATLAS_SCRIPTS/generic-ATLAS.sh
 
 SET_HOSTNAME=set_hostname
+CHECK_RO_USB=check_ro_usb
 
 set_hostname()
 {
@@ -14,6 +15,13 @@ setup_network()
 
 	set_ipv4
 	set_ipv6
+}
+
+check_ro_usb()
+{
+	if [ -b /dev/sda -a "$(cat /sys/dev/block/8:0/ro 2>/dev/null)" = 1 ]; then
+		sos "IUSB-READONLY"
+	fi
 }
 
 reboot_probe()

@@ -6,7 +6,7 @@ SSH_ARGS="-o ServerAliveInterval=60 \
           -o StrictHostKeyChecking=yes \
           -o UserKnownHostsFile=$ATLAS_STATUS/known_hosts"
 TRIGGER_MANUAL_UPGRADE_CMD=trigger_manual_upgrade
-CHECK_FOR_NEW_KERNEL_CMD=:
+CHECK_FOR_NEW_KERNEL_CMD=check_for_new_kernel
 DEV_FIRMWARE=/tmp/firmware.img
 HANDLE_STORAGE_CURRENT_TIME=handle_storage_current_time
 LOAD_STORAGE_CURRENT_TIME=load_storage_current_time
@@ -29,7 +29,7 @@ STATIC_V6_CMD=set_ipv6
 
 install_firmware()
 {
-	_wrt_syscall 'action=upgrade' "firmware=${1}"
+	_wrt_syscall 'action=upgrade' 'target=application' "firmware=${1}"
 }
 
 _get_usb_id()
@@ -214,6 +214,45 @@ check_sig()
 	echo 'End of check_sig'
 
 	return 1
+}
+
+check_for_new_kernel()
+{
+	## check for new kernel
+	if [ -n "${FIRMWARE_KERNEL}" ] ; then
+		FIRMWARE_KERNEL_VERSION_MY=`cat ${ATLAS_DATADIR}/FIRMWARE_KERNEL_VERSION`
+		FIRMWARE_KERNEL_VERSION_MY=${FIRMWARE_KERNEL_VERSION_MY:-0}
+		if [ ${FIRMWARE_KERNEL_VERSION} -gt ${FIRMWARE_KERNEL_VERSION_MY} ]; then
+			echo "there is a newer FIRMWARE_KERNEL_VERSION ${FIRMWARE_KERNEL_VERSION}, current one is ${FIRMWARE_KERNEL_VERSION_MY}"
+
+			D=`epoch`
+			echo "RESULT 9013 done ${D} ${ETHER_SCANNED} newer kernel firmware ${FIRMWARE_KERNEL_VERSION}, currently running ${FIRMWARE_KERNEL_VERSION_MY}"  >> ${DATA_DIR}/new/simpleping
+			echo "RESULT 9011 done ${D} ${ETHER_SCANNED} Starting ${SSH_CMD} -p ${CONTROLLER_1_PORT} atlas@${CONTROLLER_1_HOST} FIRMWARE_KERNEL ${FIRMWARE_KERNEL}"  >> ${DATA_DIR}/new/simpleping
+			${SSH_CMD} ${SSH_OPT} -i ${SSH_PVT_KEY} -p ${CONTROLLER_1_PORT} atlas@${CONTROLLER_1_HOST}  "FIRMWARE_KERNEL ${FIRMWARE_KERNEL}" > /tmp/${FIRMWARE_KERNEL} 2>${SSH_ERR}
+			ERR=${?}
+			if [ ${ERR} -ne 0 ] ; then
+				D=`epoch`
+				echo "RESULT 9011 done ${D} ${ETHER_SCANNED} ERR ${ERR} stderr" `cat ${SSH_ERR} 2>/dev/null`  >> ${DATA_DIR}/new/simpleping
+			fi
+
+			echo "check md5 of ${FIRMWARE_KERNEL}"
+			MD5FULL=`md5sum /tmp/${FIRMWARE_KERNEL}`
+			set ${MD5FULL}
+			MD5=${1}
+
+			if [ "${MD5}" = "${FIRMWARE_KERNEL_CS_COMP}" ] ; then
+				# the checksums match schedule an upgrade
+				echo "checksums match ${MD5} ${FIRMWARE_KERNEL_CS_COMP}"
+				_wrt_syscall 'action=upgrade' 'target=kernel' "firmware=/tmp/${FIRMWARE_KERNEL}"
+				exit
+			else
+				echo "checksums failed. ${FIRMWARE_KERNEL}"
+				echo "Ignore upgrade and proceed to Controller for INIT"
+			fi
+		else
+			echo "IGNORE kernel upgrade mine, ${FIRMWARE_KERNEL_VERSION_MY}, is newer or the same as ${FIRMWARE_KERNEL_VERSION}"
+		fi
+	fi
 }
 
 reboot_probe()
