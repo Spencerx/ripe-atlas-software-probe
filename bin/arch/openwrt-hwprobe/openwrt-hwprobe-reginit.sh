@@ -177,47 +177,88 @@ load_storage_current_time()
 	fi
 }
 
+_sig_verify()
+{
+	local file="${1}"
+	local pubkey="${2}"
+	local sig="${3}"
+	local binsig="$(mktemp)"
+	local localhash
+	local infrahash
+
+	if [ ! -f "${file}" ]; then
+		return 1
+	fi
+
+	localhash=$(sha256sum "${file}")
+	localhash="${localhash%% *}"
+
+	infrahash=$(echo "${sig}" | \
+		openssl base64 -d 2>/dev/null |
+		openssl pkeyutl -verifyrecover -inkey "${pubkey}" -keyform PEM -pubin 2>/dev/null)
+
+	test "${localhash}" = "${infrahash}"
+	return ${?}
+}
+
+_sig_retrieve()
+{
+	local name="${1}"
+	local settings=$(_ri_parse "${name}")
+
+	set -- ${settings}
+	# First argument is name
+	shift
+
+	# Second argument is key name
+	shift
+
+	# Third argument is signature
+	echo "${1}"
+}
+
 check_sig()
 {
+	local file="${1}"
+	local type="${2}"
 	local mode=$(cat ${MODE_FILE} 2>/dev/null)
-	local type
-	local key_prefixes
+	local sig
 
 	. /etc/os-release
 	case "${OPENWRT_BOARD}" in
-		'ath79/tiny') type=v3 ;;
-		'sunxi/cortexa53') type=v4 ;;
-		'mvebu/cortexa53') type=v5 ;;
+		'ath79/tiny') arch=v3 ;;
+		'sunxi/cortexa53') arch=v4 ;;
+		'mvebu/cortexa53') arch=v5 ;;
+		*) ;;
 	esac
-	eval key_prefixes=\${KEY_PREFIXES_${mode}_${type}}
+	eval key_prefixes=\${KEY_PREFIXES_${mode}_${arch}}
 
-	file="$1"
-	fw_hash=$(sha256sum $file | sed 's/ .*//')
-	for i in ${key_prefixes}; do
-		for j in 1 2 3 4 5; do      # Assume 5 sigs is enough
-			grep -q SIGNATURE_APPS${j} ${ATLAS_STATUS}/reg_init_reply.txt || continue
+	for key in ${key_prefixes}; do
+		for idx in 1 2 3 4 5; do
+			echo "Checking signature ${type}${idx} for key ${key}."
+			sig=$(_sig_retrieve "${type}${idx}")
+			if [ -z "${sig}" ]; then
+				continue
+			fi
 
-			echo "Checking signature $j for key $i"
-			grep SIGNATURE_APPS$j ${ATLAS_STATUS}/reg_init_reply.txt |
-				sed "s/SIGNATURE_APPS$j [^ ]* //" |
-				base64 -d >/tmp/sig.txt
-
-			openssl rsautl -verify -inkey $i -keyform PEM -pubin -in /tmp/sig.txt > /tmp/hash.txt
-			if [ $(cat /tmp/hash.txt) == $fw_hash ]; then
-				echo Signature checks out
+			_sig_verify "${file}" "${key}" "${sig}"
+			if [ ${?} -eq 0 ]; then
+				echo "Signature ${type}${idx} for key ${key} checks out."
 				return 0
 			else
-				echo Signature failed, got "$(cat /tmp/hash.txt)", expected $fw_hash
+				echo "Signature ${type}${idx} for key ${key} failed."
 			fi
 		done
 	done
-	echo 'End of check_sig'
 
 	return 1
 }
 
 check_for_new_kernel()
 {
+	hash_ok=1
+	sig_ok=1
+
 	## check for new kernel
 	if [ -n "${FIRMWARE_KERNEL}" ] ; then
 		FIRMWARE_KERNEL_VERSION_MY=`cat ${ATLAS_DATADIR}/FIRMWARE_KERNEL_VERSION`
@@ -240,14 +281,25 @@ check_for_new_kernel()
 			set ${MD5FULL}
 			MD5=${1}
 
-			if [ "${MD5}" = "${FIRMWARE_KERNEL_CS_COMP}" ] ; then
+			test "${MD5}" = "${FIRMWARE_KERNEL_CS_COMP}"
+			hash_ok=${?}
+			if [ ${hash_ok} -eq 0 ]; then
 				# the checksums match schedule an upgrade
 				echo "checksums match ${MD5} ${FIRMWARE_KERNEL_CS_COMP}"
-				_wrt_syscall 'action=upgrade' 'target=kernel' "firmware=/tmp/${FIRMWARE_KERNEL}"
-				exit
+				check_sig "/tmp/${FIRMWARE_KERNEL}" 'SIGNATURE_KERNEL'
+				sig_ok=${?}
+				if [ ${sig_ok} -eq 0 ]; then
+					echo "signature matched, proceeding to upgrade"
+				else
+					echo "IGNORE, signature failed"
+				fi
 			else
 				echo "checksums failed. ${FIRMWARE_KERNEL}"
 				echo "Ignore upgrade and proceed to Controller for INIT"
+			fi
+
+			if [ ${hash_ok} -eq 0 -a ${sig_ok} -eq 0 ]; then
+				_wrt_syscall 'action=upgrade' 'target=kernel' "firmware=/tmp/${FIRMWARE_KERNEL}"
 			fi
 		else
 			echo "IGNORE kernel upgrade mine, ${FIRMWARE_KERNEL_VERSION_MY}, is newer or the same as ${FIRMWARE_KERNEL_VERSION}"
