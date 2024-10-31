@@ -182,7 +182,6 @@ _sig_verify()
 	local file="${1}"
 	local pubkey="${2}"
 	local sig="${3}"
-	local binsig="$(mktemp)"
 	local localhash
 	local infrahash
 
@@ -194,7 +193,7 @@ _sig_verify()
 	localhash="${localhash%% *}"
 
 	infrahash=$(echo "${sig}" | \
-		openssl base64 -d 2>/dev/null |
+		openssl base64 -d 2>/dev/null | \
 		openssl pkeyutl -verifyrecover -inkey "${pubkey}" -keyform PEM -pubin 2>/dev/null)
 
 	test "${localhash}" = "${infrahash}"
