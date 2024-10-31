@@ -15,9 +15,9 @@ FIRMWARE_TARGET_DIR=/tmp
 RESOLV_CONF=/tmp/resolv.conf
 CHECK_SIG_CMD=check_sig
 MODE_FILE=$ATLAS_SYSCONFDIR/mode
-KEY_PREFIX_dev_v3=${ATLAS_DATADIR}/2017-11-07-dev.pem
-KEY_PREFIX_dev_v4=${ATLAS_DATADIR}/2018-04-23-dev.pem
-KEY_PREFIX_dev_v5=${ATLAS_DATADIR}/2021-02-02-dev.pem
+KEY_PREFIXES_dev_v3=${ATLAS_DATADIR}/2017-11-07-dev.pem
+KEY_PREFIXES_dev_v4=${ATLAS_DATADIR}/2018-04-23-dev.pem
+KEY_PREFIXES_dev_v5=${ATLAS_DATADIR}/2021-02-02-dev.pem
 KEY_PREFIXES_test_v3=${ATLAS_DATADIR}/2017-11-07-test.pem
 KEY_PREFIXES_test_v4=${ATLAS_DATADIR}/2018-04-23-test.pem
 KEY_PREFIXES_test_v5=${ATLAS_DATADIR}/2021-02-02-test.pem
@@ -309,9 +309,16 @@ check_for_new_kernel()
 
 reboot_probe()
 {
-	# Misnomer. NEED_REBOOT is actually a request to reconfigure the network
-	if [ "${NEED_REBOOT}" != '1' ]; then
-		# memory error or similar
-		_wrt_syscall 'action=reboot'
+	# OpenWRT will take care of rebooting if necessary. Don't
+	if [ $checksum_okay = true -a $signature_okay = true ]; then
+		return
 	fi
+
+	# Misnomer. NEED_REBOOT is actually a request to reconfigure the network
+	if [ "${NEED_REBOOT}" = '1' ]; then
+		return
+	fi
+
+	# memory error or similar
+	_wrt_syscall 'action=reboot'
 }
