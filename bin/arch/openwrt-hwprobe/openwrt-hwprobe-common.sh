@@ -1,6 +1,7 @@
 . ${ATLAS_SCRIPTS}/generic-common.sh
 
 RI_REPLY="${ATLAS_STATUS}/reg_init_reply.txt"
+SAVED_NET_CONFIG="${ATLAS_SYSCONFDIR}/hw_net_config"
 SET_LEDS_CMD=wrt_set_leds
 SETUP_NETWORK_CMD=setup_network
 INSTALL_FIRMWARE_CMD=install_firmware
@@ -17,22 +18,49 @@ _wrt_syscall()
 	ubus call hotplug.ripe-atlas call "{ \"env\": [ ${env:2} ] }"
 }
 
+_is_net_config()
+{
+	local key="${1}"
+
+	case "$key" in
+		*DHCPV4*)       return 0 ;;
+		*DHCPV6*)       return 0 ;;
+		*DNS_SERVERS*)  return 0 ;;
+		*)              return 1 ;;
+	esac
+}
 
 # Parses the line starting with $1 (key) out of reginit, and echos it
 _ri_parse()
 {
 	local key="${1}"
+	local configfile
+	local old_reply
 
-	if [ ! -r "${RI_REPLY}" ]; then
-	       return
+	# RegInit_Reply contains ALL settings
+	if [ -r "${RI_REPLY}" ]; then
+		configfile="${RI_REPLY}"
+	# ONLY network-specific settings from previous RI_REPLY - required for static (if not yet connected)
+	elif [ -r "${SAVED_NET_CONFIG}" ]; then
+		configfile="${SAVED_NET_CONFIG}"
+		old_reply=yes
+	else
+		return
 	fi
 
 	while read param; do
 		if [ "${param%% *}" = "${key}" ]; then
 			echo "${param}"
+
+			# Save config if new and network-related
+			if [ -z "${old_reply}" ] && _is_net_config "${key}" ; then
+				sed -e "/^${key}/d" -i "${SAVED_NET_CONFIG}"
+				echo "${param}" >> "${SAVED_NET_CONFIG}"
+			fi
+
 			break
 		fi
-	done < "${RI_REPLY}"
+	done < "${configfile}"
 }
 
 # Parses individual values out of a reginit line, and echos it
