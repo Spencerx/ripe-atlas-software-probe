@@ -27,7 +27,7 @@ get_arch()
 			;;
 
 		*)
-			echo 'unknown board'
+			echo 'unknown-board'
 			;;
 	esac
 }
