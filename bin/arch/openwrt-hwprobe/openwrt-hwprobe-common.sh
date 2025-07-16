@@ -18,6 +18,7 @@ _wrt_syscall()
 }
 
 
+# Parses the line starting with $1 (key) out of reginit, and echos it
 _ri_parse()
 {
 	local key="${1}"
@@ -34,6 +35,7 @@ _ri_parse()
 	done < "${RI_REPLY}"
 }
 
+# Parses individual values out of a reginit line, and echos it
 _ri_value()
 {
 	local key="${1}"
