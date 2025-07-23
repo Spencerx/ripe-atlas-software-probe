@@ -309,7 +309,8 @@ check_for_new_kernel()
 reboot_probe()
 {
 	# OpenWRT will take care of rebooting if necessary. Don't
-	if [ $checksum_okay = true -a $signature_okay = true ]; then
+	if [ "$checksum_okay" = "true" -a "$signature_okay" = "true" ]; then
+		echo "not rebooting - OpenWrt will take care of rebooting if necessary."
 		return
 	fi
 
