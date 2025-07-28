@@ -372,7 +372,7 @@ elif [ -n "$FIRMWARE_APPS" ] ; then
 			echo "Ignore upgrade and proceed to Controller for INIT"
 		fi
 
-		if [ $checksum_okay = true ]
+		if [ "$checksum_okay" = "true" ]
 		then
 			if $CHECK_SIG_CMD $FIRMWARE_FETCH_DIR/$FIRMWARE_APPS SIGNATURE_APPS
 			then
@@ -381,7 +381,7 @@ elif [ -n "$FIRMWARE_APPS" ] ; then
 			fi
 		fi
 
-		if [ $checksum_okay = true -a $signature_okay = true ]
+		if [ "$checksum_okay" = "true" -a "$signature_okay" = "true" ]
 		then
 			cp $CON_INIT_CONF $ATLAS_STATUS/FIRMWARE_APPS
 			mv $FIRMWARE_FETCH_DIR/$FIRMWARE_APPS  $FIRMWARE_TARGET_DIR
