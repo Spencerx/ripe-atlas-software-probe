@@ -68,6 +68,16 @@ _netconfig_generate_v6_ri()
 	echo "DHCPV6 $dhcpv6 IPV6ADDRESS $ipv6address IPV6PREFIXLEN $ipv6prefixlen IPV6GATEWAY $ipv6gateway"
 }
 
+# Generate RegInit-style DNS info from 'resolv.conf.static'
+_netconfig_generate_dns_ri()
+{
+	# #Original file
+	# nameserver 127.0.0.1
+	# nameserver ::1
+	file="$1"
+	tr '\n' ' ' < "$file" | sed -e 's/nameserver //g' -e 's/^/DNS_SERVERS /' -e 's/ $//' -e 's/$/\n/'
+}
+
 _netconfig_generate()
 {
 	local key="${1}"
@@ -77,7 +87,7 @@ _netconfig_generate()
 	case "$key" in
 		*DHCPV4*)       _netconfig_generate_v4_ri "${netconfig_file}" ;;
 		*DHCPV6*)       _netconfig_generate_v6_ri "${netconfig_file}" ;;
-		*DNS_SERVERS*)  return 1 ;;
+		*DNS_SERVERS*)  _netconfig_generate_dns_ri "${netconfig_file}" ;;
 		*)              return 1 ;;
 	esac
 }
