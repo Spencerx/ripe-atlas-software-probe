@@ -125,6 +125,7 @@ _get_netconfig()
 		echo "${output}"
 	# 3. No pre-existing configuration (defaults to DHCP)
 	else
+		logger -p notice -t ripe-atlas "No network configuration for \"$key\", defaulting to DHCP wrtcall."
 		return
 	fi
 }
