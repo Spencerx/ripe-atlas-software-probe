@@ -97,7 +97,7 @@ _ri_parse()
 {
 	local key="${1}"
 
-	if [ ! -r "${RI_REPLY}" ]; then
+	if [ ! -r "${RI_REPLY}" ] || [ "$(wc -c < "${RI_REPLY}")" == 0 ]; then
 		return 1
 	fi
 
