@@ -38,6 +38,24 @@ _map_key_to_netconfig_file()
 	fi
 }
 
+# Extract single-line value (f.i. "IPV4_NETMASK=255.255.255.0")
+_sed_cfg() {
+	cfg=$1
+	file=$2
+	sed -n 's/^'"${cfg}"'=\(.*\)/\1/p' "${file}"
+}
+
+# Generate RegInit-style v4 info from netconfig
+_netconfig_generate_v4_ri()
+{
+	file="$1"
+	dhcpv4=$(_sed_cfg "DHCP" "${file}")
+	ipv4address=$(_sed_cfg IPV4_LOCAL_ADDR "${file}")
+	ipv4netmask=$(_sed_cfg IPV4_NETMASK "${file}")
+	ipv4gateway=$(_sed_cfg IPV4_GW "${file}")
+	echo "DHCPV4 $dhcpv4 IPV4ADDRESS $ipv4address IPV4NETMASK $ipv4netmask IPV4GATEWAY $ipv4gateway"
+}
+
 _netconfig_generate()
 {
 	local key="${1}"
@@ -45,7 +63,7 @@ _netconfig_generate()
 
 	# Map $key to respective function
 	case "$key" in
-		*DHCPV4*)       return 1 ;;
+		*DHCPV4*)       _netconfig_generate_v4_ri "${netconfig_file}" ;;
 		*DHCPV6*)       return 1 ;;
 		*DNS_SERVERS*)  return 1 ;;
 		*)              return 1 ;;
