@@ -1529,7 +1529,16 @@ dhcpv4_end:
 					str_device, ipv6_address, prefixlen);
 			 	fprintf (f,
 			"/sbin/route -A inet6 add default gw %s dev %s\n",
-					ipv6_gw, str_device); 
+					ipv6_gw, str_device);
+
+				// Add v6 env vars to make it consistent w/ v4
+				// -> used for openwrt-hwprobe net config
+
+				fprintf (f, "IPV6_LOCAL_ADDR=%s\n", ipv6_address);
+				fprintf (f, "IPV6_PREFIX_LEN=%s\n", prefixlen);
+				fprintf (f, "IPV6_GW=%s\n",ipv6_gw);
+				fprintf (f, "DHCP=False\n");
+
 #if 0
 				// second file for static  network info
 				fprintf (f, "echo \"STATIC_IPV6_LOCAL_ADDR %s/%s\" >    %s \n", ipv6_address, prefixlen);
