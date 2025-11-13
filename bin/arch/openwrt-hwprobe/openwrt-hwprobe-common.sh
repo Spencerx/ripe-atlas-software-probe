@@ -56,6 +56,18 @@ _netconfig_generate_v4_ri()
 	echo "DHCPV4 $dhcpv4 IPV4ADDRESS $ipv4address IPV4NETMASK $ipv4netmask IPV4GATEWAY $ipv4gateway"
 }
 
+# Generate RegInit-style v6 info from netconfig
+_netconfig_generate_v6_ri()
+{
+	file="$1"
+	dhcpv6=$(_sed_cfg "DHCP" "${file}")
+	ipv6address=$(_sed_cfg IPV6_LOCAL_ADDR "${file}")
+	ipv6prefixlen=$(_sed_cfg IPV6_PREFIX_LEN "${file}")
+	ipv6gateway=$(_sed_cfg IPV6_GW "${file}")
+
+	echo "DHCPV6 $dhcpv6 IPV6ADDRESS $ipv6address IPV6PREFIXLEN $ipv6prefixlen IPV6GATEWAY $ipv6gateway"
+}
+
 _netconfig_generate()
 {
 	local key="${1}"
@@ -64,7 +76,7 @@ _netconfig_generate()
 	# Map $key to respective function
 	case "$key" in
 		*DHCPV4*)       _netconfig_generate_v4_ri "${netconfig_file}" ;;
-		*DHCPV6*)       return 1 ;;
+		*DHCPV6*)       _netconfig_generate_v6_ri "${netconfig_file}" ;;
 		*DNS_SERVERS*)  return 1 ;;
 		*)              return 1 ;;
 	esac
