@@ -1,7 +1,6 @@
 . ${ATLAS_SCRIPTS}/generic-common.sh
 
 RI_REPLY="${ATLAS_STATUS}/reg_init_reply.txt"
-SAVED_NET_CONFIG="${ATLAS_SYSCONFDIR}/hw_net_config"
 SET_LEDS_CMD=wrt_set_leds
 SETUP_NETWORK_CMD=setup_network
 INSTALL_FIRMWARE_CMD=install_firmware
@@ -34,33 +33,17 @@ _is_net_config()
 _ri_parse()
 {
 	local key="${1}"
-	local configfile
-	local old_reply
 
-	# RegInit_Reply contains ALL settings
-	if [ -r "${RI_REPLY}" ]; then
-		configfile="${RI_REPLY}"
-	# ONLY network-specific settings from previous RI_REPLY - required for static (if not yet connected)
-	elif [ -r "${SAVED_NET_CONFIG}" ]; then
-		configfile="${SAVED_NET_CONFIG}"
-		old_reply=yes
-	else
-		return
+	if [ ! -r "${RI_REPLY}" ]; then
+	       return
 	fi
 
 	while read param; do
 		if [ "${param%% *}" = "${key}" ]; then
 			echo "${param}"
-
-			# Save config if new and network-related
-			if [ -z "${old_reply}" ] && _is_net_config "${key}" ; then
-				sed -e "/^${key}/d" -i "${SAVED_NET_CONFIG}"
-				echo "${param}" >> "${SAVED_NET_CONFIG}"
-			fi
-
 			break
 		fi
-	done < "${configfile}"
+	done < "${RI_REPLY}"
 }
 
 # Parses individual values out of a reginit line, and echos it
