@@ -17,14 +17,37 @@ _wrt_syscall()
 	ubus call hotplug.ripe-atlas call "{ \"env\": [ ${env:2} ] }"
 }
 
-_is_net_config()
+_map_key_to_netconfig_file()
 {
 	local key="${1}"
 
+	# Map $key to respective file
 	case "$key" in
-		*DHCPV4*)       return 0 ;;
-		*DHCPV6*)       return 0 ;;
-		*DNS_SERVERS*)  return 0 ;;
+		*DHCPV4*)       mapped_file="${NETCONFIG_V4_VOL}" ;;
+		*DHCPV6*)       mapped_file="${NETCONFIG_V6_VOL}" ;;
+		*DNS_SERVERS*)  mapped_file="${RESOLV_CONF_VOL}" ;;
+		*)              return 1 ;;
+	esac
+
+	# Check if file exists
+	if [ -f "${mapped_file}" ]; then
+		echo "${mapped_file}"
+		return 0
+	else
+		return 1
+	fi
+}
+
+_netconfig_generate()
+{
+	local key="${1}"
+	local netconfig_file="${2}"
+
+	# Map $key to respective function
+	case "$key" in
+		*DHCPV4*)       return 1 ;;
+		*DHCPV6*)       return 1 ;;
+		*DNS_SERVERS*)  return 1 ;;
 		*)              return 1 ;;
 	esac
 }
@@ -35,7 +58,7 @@ _ri_parse()
 	local key="${1}"
 
 	if [ ! -r "${RI_REPLY}" ]; then
-	       return
+		return 1
 	fi
 
 	while read param; do
@@ -44,6 +67,26 @@ _ri_parse()
 			break
 		fi
 	done < "${RI_REPLY}"
+}
+
+# Get network configuration for given key ($1)
+_get_netconfig()
+{
+	local key="${1}"
+	local netconfig_file
+
+	# 1. RegInit_Reply contains up-to-date settings
+	if output="$(_ri_parse "${key}")"; then
+		echo "${output}"
+	# 2. NETCONFIG files contain configuration
+	# See: `atlasinit.c` for more information
+	# If configfile exists && netconfig generation works
+	elif netconfig_file=$(_map_key_to_netconfig_file "${key}") && output="$(_netconfig_generate "${key}" "${netconfig_file}")"; then
+		echo "${output}"
+	# 3. No pre-existing configuration (defaults to DHCP)
+	else
+		return
+	fi
 }
 
 # Parses individual values out of a reginit line, and echos it
@@ -66,7 +109,7 @@ _ri_value()
 
 _handle_dns()
 {
-	local settings=$(_ri_parse DNS_SERVERS)
+	local settings=$(_get_netconfig DNS_SERVERS)
 	local filter="${1}"
 	local res=''
 
@@ -85,7 +128,7 @@ _handle_dns()
 
 set_ipv4()
 {
-	local settings=$(_ri_parse DHCPV4)
+	local settings=$(_get_netconfig DHCPV4)
 	local mode=''
 	local dns
 	local gw
@@ -111,7 +154,7 @@ set_ipv4()
 
 set_ipv6()
 {
-	local settings=$(_ri_parse DHCPV6)
+	local settings=$(_get_netconfig DHCPV6)
 	local mode=''
 	local dns
 	local gw
