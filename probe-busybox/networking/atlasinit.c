@@ -67,7 +67,6 @@ const int atlas_log_level=INFO;
 
 const char atlas_contr_known_hosts[]="./known_hosts_controllers";
 const char atlas_rereg_timestamp[]="./rereg_time.sh";
-// const char atlas_con_hello[]="./con_hello.txt";
 const char atlas_con_session_id[]="./con_session_id.txt";
 const char atlas_force_reg[] = "./force_reg.sh";
 const char atlas_netconfig_v4[] = "./netconfig_v4.vol";
@@ -404,7 +403,6 @@ static int con_init_main( int argc, char *argv[] )
 	{
 		FILE *f = fopen( atlas_force_reg, "wt" );
 
-		// unlink(atlas_con_hello);
 		bzero( line, ATLAS_BUF_SIZE );
         	fgets( line, MAX_READ, read_from );
 		fprintf (f,"REASON=%s\n", line+8);
