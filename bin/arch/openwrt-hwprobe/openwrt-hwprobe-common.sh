@@ -3,6 +3,9 @@
 RI_REPLY="${ATLAS_STATUS}/reg_init_reply.txt"
 SET_LEDS_CMD=wrt_set_leds
 SETUP_NETWORK_CMD=setup_network
+# Only defined in generic-reginit.sh, but SETUP_NETWORK_CMD is called before reginit
+NETCONFIG_V4_DEST=$ATLAS_SYSCONFDIR/netconfig_v4.sh
+NETCONFIG_V6_DEST=$ATLAS_SYSCONFDIR/netconfig_v6.sh
 INSTALL_FIRMWARE_CMD=install_firmware
 
 _wrt_syscall()
@@ -23,9 +26,9 @@ _map_key_to_netconfig_file()
 
 	# Map $key to respective file
 	case "$key" in
-		*DHCPV4*)       mapped_file="${NETCONFIG_V4_VOL}" ;;
-		*DHCPV6*)       mapped_file="${NETCONFIG_V6_VOL}" ;;
-		*DNS_SERVERS*)  mapped_file="${RESOLV_CONF_VOL}" ;;
+		*DHCPV4*)       mapped_file="${NETCONFIG_V4_DEST}" ;;
+		*DHCPV6*)       mapped_file="${NETCONFIG_V6_DEST}" ;;
+		*DNS_SERVERS*)  mapped_file="${RESOLV_CONF_STATIC}" ;;
 		*)              return 1 ;;
 	esac
 
