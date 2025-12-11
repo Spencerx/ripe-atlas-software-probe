@@ -369,6 +369,8 @@ elif [ -n "$FIRMWARE_APPS" ] ; then
 		else
 			#AA if the checksum faile what next??
 			echo "checksums failed. $FIRMWARE_APPS"
+			echo "MD5sum of file        $MD5"
+			echo "FIRMWARE_APPS_CS_COMP $FIRMWARE_APPS_CS_COMP"
 			echo "Ignore upgrade and proceed to Controller for INIT"
 		fi
 
