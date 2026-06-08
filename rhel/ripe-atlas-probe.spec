@@ -209,19 +209,18 @@ if ( [ -f "%1" ] && ! cmp -s "%1" "%2" 1>/dev/null 2>&1 ); then \
 fi \
 %{nil}
 
-%define url_encode_probe_key() \
-printf '%%s' "%1" | sed \\\
-	-e 's/%%/%%25/g' \\\
-	-e 's/ /%%20/g' \\\
-	-e 's/+/%%2B/g' \\\
-	-e 's,/,%%2F,g' \\\
-	-e 's/=/%%3D/g' \
-%{nil}
-
 %define display_reginfo() \
-atlas_probe_pubkey=$(cat "%{atlas_newkey}.pub") \
+url_encode_probe_key() { \
+	printf '%%s' "$1" | sed \\\
+		-e 's/%%/%%25/g' \\\
+		-e 's/ /%%20/g' \\\
+		-e 's/+/%%2B/g' \\\
+		-e 's,/,%%2F,g' \\\
+		-e 's/=/%%3D/g' ; \
+} \
+atlas_probe_pubkey="$(cat "%{atlas_newkey}.pub")" \
 atlas_register_url_base="https://atlas.ripe.net/apply/swprobe" \
-atlas_register_url_with_key="${atlas_register_url_base}?key=$(%{url_encode_probe_key "$atlas_probe_pubkey"})" \
+atlas_register_url_with_key="${atlas_register_url_base}?key=$(url_encode_probe_key "$atlas_probe_pubkey")" \
 echo "Installation complete! Your probe's public key is:" \
 echo "${atlas_probe_pubkey}" \
 echo \
