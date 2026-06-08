@@ -96,6 +96,52 @@ lint-ci-el:
         - el9
         - el10-rpmlint
 
+test-ci-debian:
+  stage: lint
+  only:
+    - branches
+  image: ${CI_REGISTRY_IMAGE}/${OS}:${CI_COMMIT_REF_SLUG}
+  script:
+    - export OS_VERSION="$( . /etc/os-release && echo $VERSION_CODENAME )"
+    - cd ${OS_VERSION}/main/binary-${ARCH}
+    - dpkg -i ripe-atlas-repo*
+    - apt update -y
+    - apt install -y ripe-atlas-probe # current version from repo
+    - dpkg -i ripe-atlas-probe* ripe-atlas-common* # update current repo -> built version
+    - apt purge -qqy '^ripe-atlas-.*$'
+    - dpkg -i ripe-atlas-probe* ripe-atlas-common* # built version (install NOT upgrade)
+  parallel:
+    matrix:
+      - ARCH: amd64
+        OS:
+          - deb11
+          - deb12
+          - deb13
+
+test-ci-el:
+  stage: lint
+  only:
+    - branches
+  image: ${CI_REGISTRY_IMAGE}/${OS}:${CI_COMMIT_REF_SLUG}
+  script:
+    - export OS_VERSION="$( . /etc/os-release && echo $PLATFORM_ID | cut -d':' -f2 )" # extract el release (e.g. el9)
+    - cd ${OS_VERSION}/noarch/
+    - rpm -Uvh ripe-atlas-repo*
+    - dnf -y install ripe-atlas-probe # current version from repo
+    - cd ../
+    - dnf -y install */ripe-atlas-common* noarch/ripe-atlas-probe* # update current repo -> built version
+    - dnf -y remove 'ripe-atlas-*'
+    - rm -r /etc/ripe-atlas/ /var/run/ripe-atlas/ /var/spool/ripe-atlas/
+    - dnf -y install */ripe-atlas-common* noarch/ripe-atlas-probe* # built version (install NOT upgrade)
+  dependencies:
+    - build-ci-el # Only download artifacts for EL
+  parallel:
+    matrix:
+      - OS:
+          - el8
+          - el9
+          - el10
+
 .prepare-ci:
   stage: prepare
   image: ${DOCKER_IMAGE_HELPER}
