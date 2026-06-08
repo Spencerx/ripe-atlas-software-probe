@@ -65,17 +65,36 @@ ensure_newdir_is_present()
 
 generate_key()
 {
-	ssh-keygen -t rsa -P '' -C $(hostname -s) -f "${atlas_newkey}"
+	encoder_safe_hostname=$(hostname -s | tr -cd 'a-zA-Z0-9._-')
+	ssh-keygen -t rsa -P '' -C "${encoder_safe_hostname}" -f "${atlas_newkey}"
 	chown -R "${atlas_user}:${atlas_group}" "${atlas_newkey}"
 	chown -R "${atlas_user}:${atlas_group}" "${atlas_newkey}.pub"
 }
 
+url_encode_probe_key()
+{
+	printf '%s' "$1" | sed \
+		-e 's/%/%25/g' \
+		-e 's/ /%20/g' \
+		-e 's/+/%2B/g' \
+		-e 's,/,%2F,g' \
+		-e 's/=/%3D/g'
+}
+
 display_reginfo()
 {
+	atlas_probe_pubkey=$(cat "${atlas_newkey}.pub")
+	atlas_register_url_base="https://atlas.ripe.net/apply/swprobe"
+	atlas_register_url_with_key="${atlas_register_url_base}?key=$(url_encode_probe_key "$atlas_probe_pubkey")"
 	echo "Installation complete! Your probe's public key is:"
-	cat "${atlas_newkey}.pub"
+	echo "${atlas_probe_pubkey}"
+	echo
 	echo "Use this key to register your probe at:"
-	echo "https://atlas.ripe.net/apply/swprobe/"
+	echo "${atlas_register_url_base}"
+	echo
+	echo "Alternatively, you can use this pre-filled link:"
+	echo "${atlas_register_url_with_key}"
+	echo
 	echo "After this step, you can use:"
 	echo "systemctl enable --now ${service_name}"
 	echo "to start the RIPE Atlas service."
