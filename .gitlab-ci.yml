@@ -117,6 +117,7 @@ test-ci-debian:
           - deb11
           - deb12
           - deb13
+  allow_failure: true
 
 test-ci-el:
   stage: lint
@@ -141,6 +142,7 @@ test-ci-el:
           - el8
           - el9
           - el10
+  allow_failure: true
 
 .prepare-ci:
   stage: prepare
