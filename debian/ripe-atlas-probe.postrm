@@ -28,7 +28,7 @@ atlas_newdir='/etc/ripe-atlas'
 fix_rundir()
 {
 	version=$(. /etc/os-release && printf '%s\n' "${VERSION%% *}")
-	if [ "$version" = "12" ]; then
+	if [ "$version" -ge 12 ]; then
 		echo "/run/ripe-atlas"
 	else
 		echo "/var/run/ripe-atlas"
