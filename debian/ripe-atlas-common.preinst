@@ -50,13 +50,15 @@ fix_rundir()
 
 case "$1" in
 	install)
-		/usr/bin/systemd-sysusers --replace=/usr/lib/sysusers.d/ripe-atlas.conf - <<EOF
+		if command -v systemd-sysusers >/dev/null 2>&1; then
+		/usr/bin/systemd-sysusers --replace=/usr/lib/sysusers.d/ripe-atlas.conf - <<-EOF
 		g "${atlas_group}" -
 		u "${atlas_user}" - "RIPE Atlas" "$(fix_rundir)" -
 		m "${atlas_user}" "${atlas_group}"
 		u ${atlas_measurement} - "RIPE Atlas Measurements" /var/spool/ripe-atlas -
 		m "${atlas_measurement}" "${atlas_group}"
-EOF
+		EOF
+		fi
 
 		if ! [ -d "${atlas_newdir}" ]; then
 			install -d -m 0770 -o "${atlas_user}" -g "${atlas_group}" "${atlas_newdir}" 1>/dev/null 2>&1
