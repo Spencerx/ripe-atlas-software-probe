@@ -16,6 +16,8 @@ RUN dpkg --add-architecture arm64 && \
         gpg \
         # .service file (from initial .in file) is not found otherwise
         systemd \
-	# .repo uses it to determine distribution (.in file)
-	lsb-release && \
+        # .repo uses it to determine distribution (.in file)
+        lsb-release \
+        # Required for testing, generally useful
+        ca-certificates && \
     rm -rf /var/lib/apt/lists/*

@@ -3,4 +3,4 @@ FROM debian:11
 MAINTAINER mstam@ripe.net
 
 RUN apt-get update && \
-    apt-get install -y libssl-dev build-essential autoconf debhelper gpg lsb-release systemd
+    apt-get install -y libssl-dev build-essential autoconf debhelper gpg lsb-release systemd ca-certificates
