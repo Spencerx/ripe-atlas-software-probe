@@ -83,24 +83,31 @@ url_encode_probe_key()
 
 display_reginfo()
 {
-	atlas_probe_pubkey=$(cat "${atlas_newkey}.pub")
+	atlas_newkey_pub=${atlas_newkey}.pub
+	atlas_probe_pubkey=$(cat "${atlas_newkey_pub}")
 	atlas_register_url_base="https://atlas.ripe.net/apply/swprobe"
 	atlas_register_url_with_key="${atlas_register_url_base}?key=$(url_encode_probe_key "$atlas_probe_pubkey")"
 
 	if [ -t 2 ] && [ -n "${TERM-}" ] && [ "${TERM-}" != dumb ] && [ -z "${NO_COLOR-}" ]; then
 		B='\033[1m'
+		U='\033[4m'
 		GRN='\033[1;32m'
+		YEL='\033[1;33m'
 		DIM='\033[2m'
+		REV='\033[7m'
+		NRV='\033[27m'
 		R='\033[0m'
 	else
-		B='' GRN='' DIM='' R=''
+		B='' U='' GRN='' YEL='' DIM='' REV='' NRV='' R=''
 	fi
+
+	badge="${YEL}${REV} ACTION REQUIRED ${NRV}"
 
 	printf '%b\n' "${DIM}------------------------------------------------------------${R}"
 	printf '%b\n\n' "${GRN}RIPE Atlas software probe installed.${R}"
-	printf '%b\n    %s\n\n' "${B}Register your probe at:${R}" "$atlas_register_url_with_key"
-	printf '%b\n    %s\n\n' "${B}Your probe's public key (used for registration):${R}" "$atlas_probe_pubkey"
-	printf '%b\n    %b\n' "${B}After registering, start the service with:${R}" "${B}systemctl enable --now ${service_name}${R}"
+	printf '%b\n    %s\n\n' "${badge} ${U}Register your probe at:${R}" "$atlas_register_url_with_key"
+	printf '%b\n    %s\n\n' "${B}Your probe's public key (${atlas_newkey_pub}):${R}" "$atlas_probe_pubkey"
+	printf '%b\n    %b\n' "${badge} ${U}After registering, start the service with:${R}" "${YEL}systemctl enable --now ${service_name}${R}"
 	printf '%b\n' "${DIM}------------------------------------------------------------${R}"
 }
 
