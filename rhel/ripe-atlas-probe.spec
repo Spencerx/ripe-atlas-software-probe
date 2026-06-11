@@ -167,7 +167,7 @@ fi \
 
 %define generate_key() \
 encoder_safe_hostname=$(hostname -s | tr -cd 'a-zA-Z0-9._-') \
-ssh-keygen -t rsa -P '' -C "$encoder_safe_hostname" -f "%{atlas_newkey}" \
+ssh-keygen -t ed25519 -P '' -C "$encoder_safe_hostname" -f "%{atlas_newkey}" \
 chown -R "%{atlas_user}:%{atlas_group}" "%{atlas_newkey}" \
 chown -R "%{atlas_user}:%{atlas_group}" "%{atlas_newkey}.pub" \
 %{nil}
