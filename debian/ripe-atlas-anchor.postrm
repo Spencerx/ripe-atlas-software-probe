@@ -45,7 +45,9 @@ case "${1}" in
 		if [ "${1}" = 'purge' ]; then
 			rm -rf ${atlas_newdir} 1>/dev/null 2>&1 || :
 		fi
-		systemctl daemon-reload 1>/dev/null 2>&1
+		if [ -d /run/systemd/system ]; then
+			systemctl daemon-reload 1>/dev/null 2>&1 || :
+		fi
 		;;
 
 	failed-upgrade|abort-install|abort-upgrade|disappear)
