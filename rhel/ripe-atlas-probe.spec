@@ -101,11 +101,11 @@ autoreconf -iv
 	--disable-chown \
 	--disable-setcap-install \
 	--with-install-mode=probe
-make
+%make_build
 
 %install
 cd %{_builddir}/%{build_dirname}
-make DESTDIR=%{buildroot} install
+%make_install
 touch %{buildroot}%{atlas_newdir}/reg_servers.sh
 
 %files
