@@ -229,14 +229,12 @@ if [ -t 2 ] && [ -n "${TERM-}" ] && [ "${TERM-}" != dumb ] && [ -z "${NO_COLOR-}
 else \
     B='' GRN='' DIM='' R='' \
 fi \
-printf '%b\n' "${DIM}------------------------------------------------------------${R}" \
-printf '%b\n\n' "${GRN}RIPE Atlas software probe installed.${R}" \
-printf '%b\n    %s\n\n' "${B}Register your probe at:${R}" "$atlas_register_url_with_key" \
-printf '%b\n%s\n\n' "${B}Your probe's public key (used for registration):${R}" "$atlas_probe_pubkey" \
-printf '%b\n    %b\n' \\\
-    "${B}After registering, start the service with:${R}" \\\
-    "${B}systemctl enable --now %{service_name}${R}" \
-printf '%b\n' "${DIM}------------------------------------------------------------${R}" \
+printf '%b\\n' "${DIM}------------------------------------------------------------${R}" \
+printf '%b\\n\\n' "${GRN}RIPE Atlas software probe installed.${R}" \
+printf '%b\\n    %s\\n\\n' "${B}Register your probe at:${R}" "$atlas_register_url_with_key" \
+printf '%b\\n    %s\\n\\n' "${B}Your probe's public key (used for registration):${R}" "$atlas_probe_pubkey" \
+printf '%b\\n    %b\\n' "${B}After registering, start the service with:${R}" "${B}systemctl enable --now %{service_name}${R}" \
+printf '%b\\n' "${DIM}------------------------------------------------------------${R}" \
 %{nil}
 
 %post -n ripe-atlas-probe
