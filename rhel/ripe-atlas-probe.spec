@@ -222,7 +222,7 @@ atlas_newkey_pub="%{atlas_newkey}.pub" \
 atlas_probe_pubkey="$(cat "${atlas_newkey_pub}")" \
 atlas_register_url_base="https://atlas.ripe.net/apply/swprobe" \
 atlas_register_url_with_key="${atlas_register_url_base}?key=$(url_encode_probe_key "$atlas_probe_pubkey")" \
-if [ -t 2 ] && [ -n "${TERM-}" ] && [ "${TERM-}" != dumb ] && [ -z "${NO_COLOR-}" ]; then \
+if [ -z "${NO_COLOR-}" ] && [ -n "${TERM-}" ] && [ "${TERM-}" != dumb ] && { [ -t 2 ] || { : > /dev/tty; } 2>/dev/null; }; then \
 	B='\\033[1m' \
 	U='\\033[4m' \
 	GRN='\\033[1;32m' \
