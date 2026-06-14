@@ -132,7 +132,6 @@ touch %{buildroot}%{atlas_newdir}/reg_servers.sh
 %caps(cap_net_raw=ep) %attr(4750, %{atlas_measurement}, %{atlas_group}) %{_libexecdir}/%{base_path}/measurement/busybox
 %dir %{_libexecdir}/%{base_path}/scripts
 %exclude %{_libexecdir}/%{base_path}/scripts/reg_servers.sh.*
-%exclude %{_libexecdir}/%{base_path}/scripts/config.sh
 %exclude %{atlas_newdir}/reg_servers.sh
 %{_libexecdir}/%{base_path}/scripts/resolvconf
 %{_libexecdir}/%{base_path}/scripts/*.sh
@@ -141,7 +140,6 @@ touch %{buildroot}%{atlas_newdir}/reg_servers.sh
 %{_unitdir}/%{service_name}
 %{_datadir}/%{base_path}/known_hosts.reg
 %{_libexecdir}/%{base_path}/scripts/reg_servers.sh.*
-%{_libexecdir}/%{base_path}/scripts/config.sh
 %ghost %attr(0755, %{atlas_user}, %{atlas_group}) %{atlas_newdir}/reg_servers.sh
 
 %define get_state() [ -f "%{rpm_statedir}/%1" ]
