@@ -7,7 +7,7 @@ FINGERPRINT:=$(call fingerprint,$(KEY))
 KEYID:=$(call keyid,$(KEY))
 DISTRIBUTION:=$(call distribution)
 SOURCES:= \
-	ripe-atlas.list \
+	ripe-atlas.sources \
 	ripe-atlas.pol \
 	ripe-atlas.pub.gpg.asc \
 	ripe-atlas.pub.gpg

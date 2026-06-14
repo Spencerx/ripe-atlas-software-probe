@@ -73,7 +73,7 @@ SUBST_KEYWORDS = sed \
              -e 's|@repo[@]|$(REPO)|g' \
              -e 's|@release[@]|$(RELEASE)|g'
 
-%.list:	%.list.in
+%.sources:	%.sources.in
 	rm -f $@
 	$(SUBST_KEYWORDS) $< > $@
 

@@ -1,0 +1,4 @@
+Types: deb
+URIs: https://ftp.ripe.net/ripe/atlas/software-probe/@repo@debian/
+Suites: @distribution@
+Components: main

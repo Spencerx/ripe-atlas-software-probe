@@ -99,7 +99,7 @@ debian/ripe-atlas-probe*.substvars
 .repo/debian/ripe-atlas-repo/
 .repo/debian/ripe-atlas-repo*.debhelper*
 .repo/debian/ripe-atlas-repo*.substvars
-.repo/ripe-atlas.list
+.repo/ripe-atlas.sources
 .repo/ripe-atlas.pol
 .repo/ripe-atlas.pub.gpg
 .repo/ripe-atlas.pub.gpg.asc

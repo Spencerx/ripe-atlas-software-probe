@@ -1,0 +1,4 @@
+# Migration from < 1.5-6, which had .list, to new deb822 .sources format.
+# Deleting the older file ensures that the repository is not loaded twice by apt,
+# and using debhelper for it makes it easier for us and cleaner for the user.
+rm_conffile /etc/apt/sources.list.d/ripe-atlas.list 1.5-6~
