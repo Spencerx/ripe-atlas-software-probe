@@ -104,12 +104,22 @@ test-ci-debian:
   script:
     - export OS_VERSION="$( . /etc/os-release && echo $VERSION_CODENAME )"
     - cd ${OS_VERSION}/main/binary-${ARCH}
-    - dpkg -i ripe-atlas-repo*
+    # Bootstrap current version
+    - dpkg-deb --fsys-tarfile ripe-atlas-repo*.deb | tar -xOf - ./usr/share/keyrings/ripe-atlas.pub.gpg.asc > ripe-atlas.pub.gpg.asc
+    - 'dpkg-deb --fsys-tarfile ripe-atlas-repo*.deb | tar -xOf - ./etc/apt/sources.list.d/ripe-atlas.sources | sed "s|^Signed-By:.*|Signed-By: $(pwd)/ripe-atlas.pub.gpg.asc|" > /etc/apt/sources.list.d/ripe-atlas-bootstrap.sources'
     - apt update -y
-    - apt install -y ripe-atlas-probe # current version from repo
-    - dpkg -i ripe-atlas-probe* ripe-atlas-common* # update current repo -> built version
+    - apt install -y ripe-atlas-repo
+    - rm /etc/apt/sources.list.d/ripe-atlas-bootstrap.sources ripe-atlas.pub.gpg.asc
+    # Now use current -repo to test current -probe install
+    - apt update -y
+    - apt install -y ripe-atlas-probe
+    # Upgrade to local build version
+    - dpkg -i ripe-atlas-repo*
+    - apt update -y # Verify -repo still works
+    - apt install -y ripe-atlas-probe # same version from repo (should not update)
+    - dpkg -i ripe-atlas-probe* ripe-atlas-common* # local build version (upgrade)
     - apt purge -qqy '^ripe-atlas-.*$'
-    - dpkg -i ripe-atlas-probe* ripe-atlas-common* # built version (install NOT upgrade)
+    - dpkg -i ripe-atlas-probe* ripe-atlas-common* # local build version (install)
   parallel:
     matrix:
       - ARCH: amd64

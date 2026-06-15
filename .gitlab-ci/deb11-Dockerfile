@@ -4,3 +4,5 @@ MAINTAINER mstam@ripe.net
 
 RUN apt-get update && \
     apt-get install -y libssl-dev build-essential autoconf debhelper gpg lsb-release systemd ca-certificates
+# Temporary hotfix for older packages which specify /usr/bin/systemd-sysusers by direct path (<= 5120)
+RUN ln -s /bin/systemd-sysusers /usr/bin/systemd-sysusers
