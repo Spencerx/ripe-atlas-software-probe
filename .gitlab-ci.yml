@@ -57,6 +57,11 @@ build-ci-debian:
           - deb12
           - deb13
         CROSS_ARM64: "true"
+  needs:
+    - job: build_image
+      parallel:
+        matrix:
+          - OS: ['$[[ matrix.OS ]]']
 
 
 build-ci-el:
@@ -75,6 +80,11 @@ build-ci-el:
         - el8
         - el9
         - el10
+  needs:
+    - job: build_image
+      parallel:
+        matrix:
+          - OS: ['$[[ matrix.OS ]]']
 
 lint-ci-el:
   stage: lint
@@ -127,6 +137,12 @@ test-ci-debian:
           - deb11
           - deb12
           - deb13
+  needs:
+    - job: build-ci-debian
+      parallel:
+        matrix:
+          - ARCH: ['$[[ matrix.ARCH ]]']
+            OS: ['$[[ matrix.OS ]]']
   allow_failure: true
 
 test-ci-el:
@@ -152,6 +168,11 @@ test-ci-el:
           - el8
           - el9
           - el10
+  needs:
+    - job: build-ci-el
+      parallel:
+        matrix:
+          - OS: ['$[[ matrix.OS ]]']
   allow_failure: true
 
 .prepare-ci:
