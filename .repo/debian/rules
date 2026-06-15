@@ -25,6 +25,11 @@ ripe-atlas.pub.gpg.asc:	$(KEY)
 %:
 	dh $@
 
+# debhelper (>= 13.4, aka Debian 12+) trims the changelog and breaks
+# `apt changelog`. Same fix as ripe-atlas-common and others.
+override_dh_installchangelogs:
+	DEB_BUILD_OPTIONS="$(DEB_BUILD_OPTIONS) notrimdch" dh_installchangelogs
+
 override_dh_auto_clean:
 	@rm -f $(SOURCES)
 

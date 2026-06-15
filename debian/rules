@@ -33,6 +33,18 @@ sysusers:
 		-pripe-atlas-common \
 		--name=ripe-atlas
 
+# Fix: broken changelog, as it gets trimmed by Debian 12+
+# debhelper (>= 13.4, aka Debian 12+) added auto-trimming of changeloge files,
+# and started appending a footer comment:
+# > "To read the complete changelog use `apt changelog`"
+# apt treats that footer as info that the local changelog is incomplete,
+# which breaks the local changelog.
+# Typically one would use `--no-trim`, but the flag does not exist and breaks
+# in Debian 11 (13.3.4), which we currently still support. As such, we use the
+# DEB_BUILD_OPTIONS instead, which is simply ignored by Debian 11.
+override_dh_installchangelogs:
+	DEB_BUILD_OPTIONS="$(DEB_BUILD_OPTIONS) notrimdch" dh_installchangelogs
+
 override_dh_installsystemd:
 
 override_dh_installtmpfiles: sysusers
