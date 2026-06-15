@@ -1,3 +1,27 @@
+ripe-atlas-software-probe (5121) trixie bookworm bullseye; urgency=medium
+
+  * All platforms
+    - Fix unknown architectures causing registration failure
+    - Remove unused architectures and files (debian-sw-probe, openwrt-sw-probe, stale Dockerfile)
+  * Hardware Probes
+    - Addition of the 'openwrt-hwprobe' architecture, allowing for the next-generation firmware on existing hardware probes.
+    - Next-generation firmware uses a common base instead of a split-base approach.
+    - Easier debugging of update files with additional checksum printing
+    - Fix bug in reginit for APP upgrade
+  * Software Probes
+    - Change default SSH key pair algo to ed25519 for Debian and EL
+    - Include the probe's public key in the registration URL shown after installation, so it is pre-filled when registering
+    - Improve the post-install registration information: clearer and color text
+    - Add libssl3t64 for Debian 13 (authored by Dreista <Dreista@users.noreply.github.com>)
+    - Improve the Debian maintainer scripts: detect systemd gracefully and only call systemctl when systemd is in use, drop hardcoded paths (systemd-sysusers), and detect Debian 12+ instead of 12.
+    - Replace the RHEL spec rpm build commands with modern rpm macros
+  * CI
+    - Add basic testing of package installation
+  * Other
+    - Fix typo in HTTP_POST_PORT configuration entry (authored by Grant Slater <github@firefishy.com>)
+
+ -- RIPE Atlas Team <atlas@ripe.net>  Thu, 11 Jun 2026 00:00:00 +0000
+
 ripe-atlas-software-probe (5120) trixie bookworm bullseye; urgency=medium
 
   * All platforms
