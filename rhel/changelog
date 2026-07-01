@@ -1,5 +1,5 @@
 %changelog
-* Thu Jun 11 2026 RIPE Atlas Team <atlas@ripe.net> - 5121
+* Thu Jul 1 2026 RIPE Atlas Team <atlas@ripe.net> - 5121
 - All platforms
   - Fix unknown architectures causing registration failure
   - Remove unused architectures and files (debian-sw-probe, openwrt-sw-probe, stale Dockerfile)

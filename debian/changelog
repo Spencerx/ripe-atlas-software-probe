@@ -20,7 +20,7 @@ ripe-atlas-software-probe (5121) trixie bookworm bullseye; urgency=medium
   * Other
     - Fix typo in HTTP_POST_PORT configuration entry (authored by Grant Slater <github@firefishy.com>)
 
- -- RIPE Atlas Team <atlas@ripe.net>  Thu, 11 Jun 2026 00:00:00 +0000
+ -- RIPE Atlas Team <atlas@ripe.net>  Wed, 01 Jul 2026 00:00:00 +0000
 
 ripe-atlas-software-probe (5120) trixie bookworm bullseye; urgency=medium
 
