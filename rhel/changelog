@@ -1,4 +1,9 @@
 %changelog
+* Mon Jul 6 2026 RIPE Atlas Team <atlas@ripe.net> - 5122
+- Software Probes
+  - Update probe registration links from apply -> register
+  - Update regservers for dev/test
+
 * Thu Jul 1 2026 RIPE Atlas Team <atlas@ripe.net> - 5121
 - All platforms
   - Fix unknown architectures causing registration failure
