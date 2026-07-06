@@ -61,10 +61,10 @@ Requires:	ripe-atlas-common = %{version}-%{release}
 Provides:	ripe-atlas-software-probe
 Obsoletes:	atlasswprobe < 5080-3%{?dist}
 Conflicts:      atlasprobe, atlasswprobe, ripe-atlas-anchor
-URL:            https://atlas.ripe.net/apply/swprobe/
+URL:            https://atlas.ripe.net/register/swprobe
 
 %description -n ripe-atlas-probe
-Probe specific files and configurations that form a working software probe. Please visit https://atlas.ripe.net/apply/swprobe/ to register.
+Probe specific files and configurations that form a working software probe. Please visit https://atlas.ripe.net/register/swprobe to register.
 
 %prep
 echo "Building for probe version: %{version}"
@@ -218,7 +218,7 @@ url_encode_probe_key() { \
 } \
 atlas_newkey_pub="%{atlas_newkey}.pub" \
 atlas_probe_pubkey="$(cat "${atlas_newkey_pub}")" \
-atlas_register_url_base="https://atlas.ripe.net/apply/swprobe" \
+atlas_register_url_base="https://atlas.ripe.net/register/swprobe" \
 atlas_register_url_with_key="${atlas_register_url_base}?key=$(url_encode_probe_key "$atlas_probe_pubkey")" \
 if [ -z "${NO_COLOR-}" ] && [ -n "${TERM-}" ] && [ "${TERM-}" != dumb ] && { [ -t 2 ] || { : > /dev/tty; } 2>/dev/null; }; then \
 	B='\\033[1m' \

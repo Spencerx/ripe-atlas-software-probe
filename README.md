@@ -93,7 +93,7 @@ See [the FAQ](#upgrade-from-atlasswprobe-5080) for more information about the up
 
 ### Generic installation instructions
 
-The public key is stored in `/etc/ripe-atlas/probe_key.pub`. Use it to register your probe at <https://atlas.ripe.net/apply/swprobe/>.
+The public key is stored in `/etc/ripe-atlas/probe_key.pub`. Use it to register your probe at <https://atlas.ripe.net/register/swprobe>.
 
 ### TCP ports conflict
 

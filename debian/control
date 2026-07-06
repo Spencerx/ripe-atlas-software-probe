@@ -43,7 +43,7 @@ Conflicts: ripe-atlas-anchor, atlasswprobe
 Replaces: atlasswprobe
 Section: net
 Priority: optional
-Homepage: https://atlas.ripe.net/apply/swprobe/
+Homepage: https://atlas.ripe.net/register/swprobe
 Description: RIPE Atlas probe specific files and configuration
  RIPE Atlas is the RIPE NCC's main Internet data collection system.
  It is a global network of devices, called probes and anchors, that
@@ -55,7 +55,7 @@ Description: RIPE Atlas probe specific files and configuration
  This package contains probe specific files and configuration.
  It must be installed for a probe to operate as expected.
  .
- Please visit https://atlas.ripe.net/apply/swprobe/ to register.
+ Please visit https://atlas.ripe.net/register/swprobe to register.
 
 Package: ripe-atlas-anchor
 Architecture: all

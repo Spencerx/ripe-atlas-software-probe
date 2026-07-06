@@ -191,7 +191,7 @@ RIPE Atlas (Software Probe)
 Probe specific files and configurations that
 form a working software probe.
 
-Please visit https://atlas.ripe.net/apply/swprobe/
+Please visit https://atlas.ripe.net/register/swprobe
 to register.
 endef
 

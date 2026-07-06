@@ -85,7 +85,7 @@ display_reginfo()
 {
 	atlas_newkey_pub=${atlas_newkey}.pub
 	atlas_probe_pubkey=$(cat "${atlas_newkey_pub}")
-	atlas_register_url_base="https://atlas.ripe.net/apply/swprobe"
+	atlas_register_url_base="https://atlas.ripe.net/register/swprobe"
 	atlas_register_url_with_key="${atlas_register_url_base}?key=$(url_encode_probe_key "$atlas_probe_pubkey")"
 
 	if [ -t 2 ] && [ -n "${TERM-}" ] && [ "${TERM-}" != dumb ] && [ -z "${NO_COLOR-}" ]; then
