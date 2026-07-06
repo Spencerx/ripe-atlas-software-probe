@@ -48,13 +48,6 @@ popd
 > ```
 > This can **only** be done after the `ripe-atlas-repo` package has been installed.
 
-> [!TIP]
-> If you have an error mentioning `setcap: not found`, you can install the `libcap2-bin` package:
-> ```sh
-> apt-get install libcap2-bin
-> ```
-> This will be fixed in a future release.
-
 ## Enterprise Linux
 
 We provide RPMs for `amd64` Enterprise Linux 8 / 9 / 10, as shown in [README.md](README.md#enterprise-linux). To manually build an RPM package, we provide the following instructions
