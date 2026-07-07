@@ -12,12 +12,10 @@ The source code can build 4 different packages:
 - `ripe-atlas-repo`: sets up the RIPE Atlas **repository**
 
 > [!IMPORTANT]
-> The `ripe-atlas-anchor` package is intended for deploying Atlas anchors.
+> The `ripe-atlas-anchor` package is intended only for RIPE Atlas anchors.
 >
-> Please install ***only*** when instructed to do so by RIPE NCC staff.
-
-> [!TIP]
-> It is not required to install `sudo`, even though the instructions might make use of it; having root privileges is sufficient.
+> You cannot install the package and expect to have an anchor.<br>
+> [The process to obtain an anchor](https://www.ripe.net/analyse/internet-measurements/ripe-atlas/host-an-anchor/) is very different from a probe.
 
 ## Debian / RPi OS
 
