@@ -35,6 +35,9 @@
 
 #define NTP_OPT_STRING ("!46c:i:s:w:A:B:O:R:W:")
 
+// "RIPE"
+#define NTP_REF_ID_RIPE 0x45504952
+
 #define OPT_4	(1 << 0)
 #define OPT_6	(1 << 1)
 
@@ -543,7 +546,7 @@ static void send_pkt(struct ntpstate *state)
 	}
 
 	ntphdr->ntp_flags= (NTP_VERSION << NTP_VERSION_SHIFT) | NTP_MODE_CLIENT;
-	ntphdr->ntp_reference_id = 0x45504952;  /* "RIPE" */
+	ntphdr->ntp_reference_id = NTP_REF_ID_RIPE;
 
 	gettimeofday(&state->xmit_time, NULL);
 
