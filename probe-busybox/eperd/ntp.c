@@ -1000,7 +1000,7 @@ static void *ntp_init(int __attribute((unused)) argc, char *argv[],
 	out_filename= NULL;
 	response_in= NULL;
 	response_out= NULL;
-	opt_complementary = "=1:4--6:i--u:c+:s+:w+:";
+	opt_complementary = "=1:4--6:c+:s+:w+:";
 
 	opt = getopt32(argv, NTP_OPT_STRING, &count,
 		&interface, &size, &timeout, &str_Atlas, &str_bundle, &out_filename,
