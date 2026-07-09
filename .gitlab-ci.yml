@@ -1,7 +1,7 @@
 stages:
   - docker_image
   - build
-  - lint
+  - test
   - prepare
   - commit
 
@@ -103,7 +103,7 @@ build-ci-manual:
           - OS: ['$[[ matrix.OS ]]']
 
 lint-ci-el:
-  stage: lint
+  stage: test
   only:
     - branches
   image: ${CI_REGISTRY_IMAGE}/${OS}:${CI_COMMIT_REF_SLUG}
@@ -123,7 +123,7 @@ lint-ci-el:
         - el10-rpmlint
 
 test-ci-debian:
-  stage: lint
+  stage: test
   only:
     - branches
   image: ${CI_REGISTRY_IMAGE}/${OS}:${CI_COMMIT_REF_SLUG}
@@ -162,7 +162,7 @@ test-ci-debian:
   allow_failure: true
 
 test-ci-el:
-  stage: lint
+  stage: test
   only:
     - branches
   image: ${CI_REGISTRY_IMAGE}/${OS}:${CI_COMMIT_REF_SLUG}
