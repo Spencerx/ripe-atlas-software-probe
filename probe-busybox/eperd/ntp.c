@@ -45,8 +45,6 @@
 #define SRC_BASE_PORT	(20480)
 #define MAX_DATA_SIZE   (4096)
 
-#define DBQ(str) "\"" #str "\""
-
 #define RESP_PACKET		1
 #define RESP_SOCKNAME		2
 #define RESP_DSTADDR		3
