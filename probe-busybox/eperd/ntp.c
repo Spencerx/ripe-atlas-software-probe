@@ -106,14 +106,7 @@ struct ntpstate
 	int socket;			/* Socket for sending and receiving */
 	struct event event_socket;	/* Event for this socket */
 	unsigned first:1;		/* Waiting for first response */
-	unsigned done:1;		/* We got something from the target
-					 * host or a destination unreachable.
-					 */
-	unsigned not_done:1;		/* Not got something else */
 	unsigned busy:1;		/* Busy, do not start another one */
-	unsigned gotresp:1;		/* Got a response to the last packet
-					 * we sent. For dup detection.
-					 */
 	unsigned dnsip:1;		/* Busy with dns name resolution */
 	unsigned report_dst:1;		/* Report dst anyhow */
 	struct evutil_addrinfo *dns_res;
@@ -138,13 +131,6 @@ struct ntpstate
 	struct ntp_ts ntp_reference_ts;
 
 	struct event timer;
-
-	unsigned long min;
-	unsigned long max;
-	unsigned long sum;
-	int sentpkts;
-	int rcvdpkts;
-	int duppkts;
 
 	char *result;
 	size_t reslen;
@@ -513,8 +499,6 @@ static void send_pkt(struct ntpstate *state)
 	double d;
 	struct timeval interval;
 	char line[80];
-
-	state->gotresp= 0;
 
 	base= state->base;
 
@@ -944,18 +928,10 @@ static void noreply_callback(int __attribute((unused)) unused,
 
 	state= s;
 
-#if 0
-	printf("noreply_callback: gotresp = %d\n",
-		state->gotresp);
-#endif
-
-	if (!state->gotresp)
-	{
-		if (state->open_result)
-			add_str(state, " }, { ");
-		add_str(state, DBQ(x) ":" DBQ(*));
-		state->open_result= 1;
-	}
+	if (state->open_result)
+		add_str(state, " }, { ");
+	add_str(state, DBQ(x) ":" DBQ(*));
+	state->open_result= 1;
 
 	send_pkt(state);
 }
@@ -1162,18 +1138,9 @@ static void ntp_start2(void *state)
 		return;
 	}
 
-	ntpstate->min= ULONG_MAX;
-	ntpstate->max= 0;
-	ntpstate->sum= 0;
-	ntpstate->sentpkts= 0;
-	ntpstate->rcvdpkts= 0;
-	ntpstate->duppkts= 0;
-
 	ntpstate->sent= 0;
 	ntpstate->seq= 0;
 	ntpstate->first= 1;
-	ntpstate->done= 0;
-	ntpstate->not_done= 0;
 
 	if (ntpstate->result) free(ntpstate->result);
 	ntpstate->resmax= 80;
