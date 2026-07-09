@@ -634,12 +634,7 @@ static void send_pkt(struct ntpstate *state)
 	evtimer_add(&state->timer, &interval);
 
 	if (state->response_in)
-	{
-		if (state->sin6.sin6_family == AF_INET6)
-			ready_callback(0, 0, state);
-		else
-			ready_callback(0, 0, state);
-	}
+		ready_callback(0, 0, state);
 }
 
 static void ready_callback(int __attribute((unused)) unused,
@@ -1264,7 +1259,7 @@ static int create_socket(struct ntpstate *state)
 	event_assign(&state->event_socket, state->base->event_base,
 		state->socket,
 		EV_READ | EV_PERSIST,
-		(af == AF_INET6 ? ready_callback : ready_callback),
+		ready_callback,
 		state);
 	if (!state->response_in)
 		event_add(&state->event_socket, NULL);
