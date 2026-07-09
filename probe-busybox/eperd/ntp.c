@@ -35,8 +35,7 @@
 
 #define NTP_OPT_STRING ("!46c:i:s:w:A:B:O:R:W:")
 
-// "RIPE"
-#define NTP_REF_ID_RIPE 0x45504952
+#define NTP_REF_ID_RIPE (htonl(('R' << 24) | ('I' << 16) | ('P' << 8) | 'E'))
 
 #define OPT_4	(1 << 0)
 #define OPT_6	(1 << 1)
