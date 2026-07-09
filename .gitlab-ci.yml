@@ -191,6 +191,21 @@ test-ci-el:
           - OS: ['$[[ matrix.OS ]]']
   allow_failure: true
 
+test-ci-manual-testsuite:
+  stage: test
+  only:
+    - branches
+  image: ${CI_REGISTRY_IMAGE}/${OS}:${CI_COMMIT_REF_SLUG}
+  script:
+    - .gitlab-ci/build-manual.sh
+    - cd probe-busybox/testsuite
+    - ./runtest -v
+  variables:
+    OS: deb13
+  needs:
+    - job: build-ci-manual
+  allow_failure: true
+
 .prepare-ci:
   stage: prepare
   image: ${DOCKER_IMAGE_HELPER}
