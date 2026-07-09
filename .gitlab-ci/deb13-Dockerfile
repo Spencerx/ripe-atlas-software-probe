@@ -18,6 +18,8 @@ RUN dpkg --add-architecture arm64 && \
         systemd \
         # .repo uses it to determine distribution (.in file)
         lsb-release \
+        # required for manual building (install-step)
+        libcap2-bin \
         # Required for testing, generally useful
         ca-certificates && \
     rm -rf /var/lib/apt/lists/*

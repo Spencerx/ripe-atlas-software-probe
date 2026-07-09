@@ -86,6 +86,22 @@ build-ci-el:
         matrix:
           - OS: ['$[[ matrix.OS ]]']
 
+build-ci-manual:
+  stage: build
+  image: ${CI_REGISTRY_IMAGE}/${OS}:${CI_COMMIT_REF_SLUG}
+  script:
+    - .gitlab-ci/build-manual.sh
+  dependencies: [] # Don't download any artifacts
+  parallel:
+    matrix:
+      - OS:
+        - deb13
+  needs:
+    - job: build_image
+      parallel:
+        matrix:
+          - OS: ['$[[ matrix.OS ]]']
+
 lint-ci-el:
   stage: lint
   only:
