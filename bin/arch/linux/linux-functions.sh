@@ -151,6 +151,24 @@ get_ether_addr()
 	ETHER_ADDR=$2; export ETHER_ADDR
 	ETHER_SCANNED=`echo $ETHER_ADDR | sed -e s/\://g`; export ETHER_SCANNED
 }
+dump_interfaces()
+{
+	# 1. `ip -s a` is the best replacement to `ifconfig`
+	if ip -s a > /dev/null 2>&1 ; then
+		ip -s a
+	# 2. Busybox doesn't support `-s`, so we drop it for `ip a`
+	elif ip a > /dev/null 2>&1 ; then
+		ip a
+		cat /proc/net/dev
+	# 3. deprecated `ifconfig` still works
+	elif command -v ifconfig > /dev/null 2>&1 ; then
+		ifconfig
+	# 4. Otherwise things are genuinely broken
+	else
+		echo "dump_interfaces: missing 'ip' or 'ifconfig'; install iproute2 (or deprecated net-tools)" 1>&2
+		cat /proc/net/dev
+	fi
+}
 set_date_from_currenttime_txt()
 {
 	if [ -f $STATUS_DIR/currenttime.txt ]

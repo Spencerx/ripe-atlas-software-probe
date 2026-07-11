@@ -19,6 +19,7 @@ NTPCLIENT_CMD=:
 CHOWN_FOR_MSM=:
 CHMOD_FOR_MSM=:
 SET_HOSTNAME=:
+DUMP_INTERFACES_CMD=dump_interfaces
 
 # For OpenWrt we need telnetd to run as root.
 telnetd()

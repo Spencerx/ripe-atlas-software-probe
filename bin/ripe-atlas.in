@@ -118,7 +118,7 @@ telnetd -b 127.0.0.1 -p $TELNETD_PORT -P $RUN_DIR/telnetd-port$TELNETD_PORT-pid.
 
 $BUDDYINFO $LOW_MEM_T $DATA_NEW_DIR/simpleping
 
-ip addr
+$DUMP_INTERFACES_CMD
 
 $CHOWN_FOR_MSM
 $CHMOD_FOR_MSM
