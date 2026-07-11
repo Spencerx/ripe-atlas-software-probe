@@ -14,7 +14,7 @@
 //kbuild:lib-$(CONFIG_EVNTP) += evntp.o
 
 //usage:#define evntp_trivial_usage
-//usage:	"-[46] [-c <count>] [-i <interface>] [-w <timeout>]"
+//usage:	"-[46] [-c <count>] [-i <interface>] [-w <timeout>] [-g <gap>]"
 //usage:	"\n\t[-A <Atlas ID>] [-B <bundle ID>] [-O <output file>]"
 //usage:	"\n\t[-R <response in>] [-W <response out>] [-s <size>] "
 //usage:	"<target>\n"
@@ -25,6 +25,7 @@
 //usage:       "\n     -c <count>      Number of packets"
 //usage:       "\n     -i <interface>  Outgoing interface"
 //usage:       "\n     -w <timeout>    Time to wait for reply"
+//usage:       "\n     -g <gap>        Minimum time between requests"
 //usage:       "\n     -A <id>         Atlas measurement ID"
 //usage:       "\n     -B <id>         bundle ID"
 //usage:       "\n     -O <out file>   Output file name"

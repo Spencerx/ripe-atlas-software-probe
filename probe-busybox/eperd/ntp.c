@@ -33,9 +33,13 @@
 
 #define NTP_PORT	123
 
-#define NTP_OPT_STRING ("!46c:i:s:w:A:B:O:R:W:")
+#define NTP_OPT_STRING ("!46c:i:s:w:g:A:B:O:R:W:")
 
 #define NTP_REF_ID_RIPE (htonl(('R' << 24) | ('I' << 16) | ('P' << 8) | 'E'))
+// 4000ms default, sourced from NIST recommendations
+//#define NTP_GAP_MIN_MS     2000
+#define NTP_GAP_DEFAULT_MS 4000
+//#define NTP_GAP_MAX_MS     60000
 
 #define OPT_4	(1 << 0)
 #define OPT_6	(1 << 1)
@@ -88,7 +92,7 @@ struct ntpstate
 	char do_v6;
 	char count;
 	uint16_t size;
-	unsigned timeout;
+	unsigned timeout, gap;
 	char *response_in;	/* Fuzzing */
 	char *response_out;
 
@@ -107,6 +111,10 @@ struct ntpstate
 	struct event event_socket;	/* Event for this socket */
 	unsigned first:1;		/* Waiting for first response */
 	unsigned busy:1;		/* Busy, do not start another one */
+	unsigned gotresp:1;		/* Got a response to the last packet
+					 * we sent. For only sending after gap time,
+					 * unlike traceroute.c which is for dup detection.
+					 */
 	unsigned dnsip:1;		/* Busy with dns name resolution */
 	unsigned report_dst:1;		/* Report dst anyhow */
 	struct evutil_addrinfo *dns_res;
@@ -130,7 +138,8 @@ struct ntpstate
 	uint32_t ntp_reference_id;
 	struct ntp_ts ntp_reference_ts;
 
-	struct event timer;
+	struct event timer_timeout;
+	struct event timer_gap;
 
 	char *result;
 	size_t reslen;
@@ -361,7 +370,8 @@ static void report(struct ntpstate *state)
 	char line[80];
 	struct addrinfo hints;
 
-	event_del(&state->timer);
+	event_del(&state->timer_timeout);
+	event_del(&state->timer_gap);
 
 	if (state->out_filename)
 	{
@@ -500,6 +510,8 @@ static void send_pkt(struct ntpstate *state)
 	struct timeval interval;
 	char line[80];
 
+	state->gotresp= 0;
+
 	base= state->base;
 
 	if (state->sent >= state->count)
@@ -621,9 +633,9 @@ static void send_pkt(struct ntpstate *state)
 	}
 
 	if (state->open_result)
-		add_str(state, " }, ");
+		add_str(state, " }, "); // close previous result
 	add_str(state, "{ ");
-	state->open_result= 0;
+	state->open_result= 0; // new result is empty, not yet "open"
 
 	/* Increment packets sent */
 	state->sent++;
@@ -631,7 +643,10 @@ static void send_pkt(struct ntpstate *state)
 	/* Set timer */
 	interval.tv_sec= state->timeout/1000000;
 	interval.tv_usec= state->timeout % 1000000;
-	evtimer_add(&state->timer, &interval);
+	evtimer_add(&state->timer_timeout, &interval);
+	interval.tv_sec= state->gap/1000000;
+	interval.tv_usec= state->gap % 1000000;
+	evtimer_add(&state->timer_gap, &interval);
 
 	if (state->response_in)
 		ready_callback(0, 0, state);
@@ -895,8 +910,13 @@ printf("%s, %d: sin6_family = %d\n", __FILE__, __LINE__, state->sin6.sin6_family
 	add_str(state, line);
 
 	state->open_result= 1;
-		
-	send_pkt(state);
+
+	state->gotresp= 1;
+	evtimer_del(&state->timer_timeout);
+
+	// Only "send a packet" if gap has elapsed, or there are no more packets to send (aka finish, doesnt actually send anything).
+	if (!evtimer_pending(&state->timer_gap, NULL) || state->sent >= state->count)
+		send_pkt(state);
 }
 
 static struct ntpbase *ntp_base_new(struct event_base
@@ -919,16 +939,26 @@ static struct ntpbase *ntp_base_new(struct event_base
 static void noreply_callback(int __attribute((unused)) unused,
 	const short __attribute((unused)) event, void *s)
 {
-	struct ntpstate *state;
+	struct ntpstate *state = s;
 
-	state= s;
-
-	if (state->open_result)
+	if (state->open_result) // doesn't currently happen, but may if open_result=1 starts being added elsewhere in the future
 		add_str(state, " }, { ");
 	add_str(state, DBQ(x) ":" DBQ(*));
-	state->open_result= 1;
+	state->open_result= 1; // we wrote a result, thus it's now open
 
-	send_pkt(state);
+	// Only "send a packet" if gap has elapsed, or there are no more packets to send (aka finish, doesnt actually send anything).
+	// -> same condition as ready_callback, for the same reason
+	if (!evtimer_pending(&state->timer_gap, NULL) || state->sent >= state->count)
+		send_pkt(state);
+}
+
+static void gap_callback(int __attribute((unused)) unused,
+	const short __attribute((unused)) event, void *s)
+{
+	struct ntpstate *state = s;
+
+	if(state->gotresp || !evtimer_pending(&state->timer_timeout, NULL))
+		send_pkt(state);
 }
 
 static void *ntp_init(int __attribute((unused)) argc, char *argv[],
@@ -936,7 +966,7 @@ static void *ntp_init(int __attribute((unused)) argc, char *argv[],
 {
 	uint32_t opt;
 	int i, do_v6;
-	unsigned count, timeout, size;
+	unsigned count, timeout, gap, size;
 		/* must be int-sized */
 	size_t newsiz;
 	char *str_Atlas;
@@ -964,16 +994,17 @@ static void *ntp_init(int __attribute((unused)) argc, char *argv[],
 	size= 0;
 	interface= NULL;
 	timeout= 1000;
+	gap= NTP_GAP_DEFAULT_MS;
 	str_Atlas= NULL;
 	str_bundle= NULL;
 	out_filename= NULL;
 	response_in= NULL;
 	response_out= NULL;
-	opt_complementary = "=1:4--6:c+:s+:w+:";
+	opt_complementary = "=1:4--6:c+:s+:w+:g+:";
 
 	opt = getopt32(argv, NTP_OPT_STRING, &count,
-		&interface, &size, &timeout, &str_Atlas, &str_bundle, &out_filename,
-		&response_in, &response_out);
+		&interface, &size, &timeout, &gap, &str_Atlas, &str_bundle,
+		&out_filename, &response_in, &response_out);
 	hostname = argv[optind];
 
 	if (opt == 0xffffffff)
@@ -1071,6 +1102,7 @@ static void *ntp_init(int __attribute((unused)) argc, char *argv[],
 	state->size= size;
 	state->destportstr= strdup(destportstr);
 	state->timeout= timeout*1000;
+	state->gap= gap*1000;
 	state->atlas= str_Atlas ? strdup(str_Atlas) : NULL;
 	state->bundle= str_bundle ? strdup(str_bundle) : NULL;
 	state->hostname= strdup(hostname);
@@ -1109,8 +1141,10 @@ static void *ntp_init(int __attribute((unused)) argc, char *argv[],
 	memset(&state->loc_sin6, '\0', sizeof(state->loc_sin6));
 	state->loc_socklen= 0;
 
-	evtimer_assign(&state->timer, state->base->event_base,
+	evtimer_assign(&state->timer_timeout, state->base->event_base,
 		noreply_callback, state);
+	evtimer_assign(&state->timer_gap, state->base->event_base,
+		gap_callback, state);
 
 	return state;
 
@@ -1466,7 +1500,8 @@ static int ntp_delete(void *state)
 		crondlog(DIE9 "strange, state not in table");
 	base->table[ind]= NULL;
 
-	event_del(&ntpstate->timer);
+	event_del(&ntpstate->timer_timeout);
+	event_del(&ntpstate->timer_gap);
 
 	free(ntpstate->atlas);
 	ntpstate->atlas= NULL;
