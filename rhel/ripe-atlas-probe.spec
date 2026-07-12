@@ -43,7 +43,7 @@ Group:      	Applications/Internet
 Version:    	%{version}
 Release:    	1%{?dist}
 License:    	GPLv3.0
-Requires:   	psmisc libcap openssh-clients iproute procps-ng net-tools hostname /bin/sh bash
+Requires:   	psmisc libcap openssh-clients (iproute or net-tools) procps-ng hostname /bin/sh bash
 Requires(pre):  %{_sbindir}/semanage %{_bindir}/systemd-sysusers %{_bindir}/systemd-tmpfiles
 Requires(post): %{_sbindir}/semanage
 BuildRequires:	rpm systemd-rpm-macros systemd openssl-devel autoconf automake libtool make

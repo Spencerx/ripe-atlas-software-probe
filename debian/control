@@ -17,7 +17,7 @@ Depends:
  ${shlibs:Depends},
  ${misc:Depends},
  libssl3t64 | libssl3 | libssl1.1,
- net-tools,
+ iproute2 | net-tools,
  openssh-client,
  psmisc,
  systemd,
