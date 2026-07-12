@@ -147,8 +147,26 @@ ssh_exec()
 }
 get_ether_addr()
 {
-	set $(ip link | grep 'link\/ether' | head -1)
-	ETHER_ADDR=$2; export ETHER_ADDR
+	# 1. iproute2: the `link/ether <mac>` line carries the MAC as $2
+	if ip link > /dev/null 2>&1 ; then
+		set $(ip link | grep 'link\/ether' | head -1)
+		ETHER_ADDR=$2
+	# 2. net-tools: MAC varies by implementation
+	#    `ether`  (net-tools 2.x, FreeBSD, macOS),
+	#    `HWaddr` (old net-tools, busybox),
+	#    `lladdr` (OpenBSD).
+	#  -> grab the first token of exactly six 2-hex-digit groups.
+	#     No valid IPv6 address has that shape (it needs 8 groups
+	#     or a `::`), so a MAC is the only thing this can match.
+	elif command -v ifconfig > /dev/null 2>&1 ; then
+		hh='[0-9a-fA-F][0-9a-fA-F]'
+		for word in $(ifconfig 2>/dev/null); do
+			case $word in
+			$hh:$hh:$hh:$hh:$hh:$hh) ETHER_ADDR=$word; break;;
+			esac
+		done
+	fi
+	export ETHER_ADDR
 	ETHER_SCANNED=`echo $ETHER_ADDR | sed -e s/\://g`; export ETHER_SCANNED
 }
 dump_interfaces()
