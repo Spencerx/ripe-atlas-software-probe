@@ -644,9 +644,15 @@ static void send_pkt(struct ntpstate *state)
 	interval.tv_sec= state->timeout/1000000;
 	interval.tv_usec= state->timeout % 1000000;
 	evtimer_add(&state->timer_timeout, &interval);
-	interval.tv_sec= state->gap/1000000;
-	interval.tv_usec= state->gap % 1000000;
-	evtimer_add(&state->timer_gap, &interval);
+
+	// Replay responses should not have gap inbetween requests, there is no server
+	// (evtimer_pending() on timer_gap stays `false` -> "gap already passed")
+	if (!state->response_in)
+	{
+		interval.tv_sec= state->gap/1000000;
+		interval.tv_usec= state->gap % 1000000;
+		evtimer_add(&state->timer_gap, &interval);
+	}
 
 	if (state->response_in)
 		ready_callback(0, 0, state);
