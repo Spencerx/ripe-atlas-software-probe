@@ -46,7 +46,7 @@ License:    	GPLv3.0
 Requires:   	psmisc libcap openssh-clients iproute procps-ng net-tools hostname /bin/sh bash
 Requires(pre):  %{_sbindir}/semanage %{_bindir}/systemd-sysusers %{_bindir}/systemd-tmpfiles
 Requires(post): %{_sbindir}/semanage
-BuildRequires:	rpm systemd-rpm-macros %{?el7:systemd} %{?el8:systemd} openssl-devel autoconf automake libtool make
+BuildRequires:	rpm systemd-rpm-macros systemd openssl-devel autoconf automake libtool make
 URL:            https://atlas.ripe.net/
 %{systemd_requires}
 
