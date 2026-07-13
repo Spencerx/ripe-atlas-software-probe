@@ -1,4 +1,7 @@
 %changelog
+* Mon Jul 13 2026 RIPE Atlas Team <atlas@ripe.net> - 5123
+- TODO (See MR text...)
+
 * Mon Jul 6 2026 RIPE Atlas Team <atlas@ripe.net> - 5122
 - Software Probes
   - Update probe registration links from apply -> register
