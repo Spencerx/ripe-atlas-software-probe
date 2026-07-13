@@ -37,9 +37,9 @@
 
 #define NTP_REF_ID_RIPE (htonl(('R' << 24) | ('I' << 16) | ('P' << 8) | 'E'))
 // 4000ms default, sourced from NIST recommendations
-//#define NTP_GAP_MIN_MS     2000
+#define NTP_GAP_MIN_MS     2000
 #define NTP_GAP_DEFAULT_MS 4000
-//#define NTP_GAP_MAX_MS     60000
+#define NTP_GAP_MAX_MS     60000
 
 #define OPT_4	(1 << 0)
 #define OPT_6	(1 << 1)
@@ -1016,6 +1016,12 @@ static void *ntp_init(int __attribute((unused)) argc, char *argv[],
 	if (opt == 0xffffffff)
 	{
 		crondlog(LVL8 "bad options");
+		return NULL;
+	}
+
+	if (gap < NTP_GAP_MIN_MS || gap > NTP_GAP_MAX_MS)
+	{
+		crondlog(LVL8 "bad gap"); // Similar to above + ping.c's bad interval
 		return NULL;
 	}
 
