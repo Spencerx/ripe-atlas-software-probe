@@ -147,25 +147,26 @@ ssh_exec()
 }
 get_ether_addr()
 {
-	# 1. iproute2: the `link/ether <mac>` line carries the MAC as $2
-	if ip link > /dev/null 2>&1 ; then
-		set $(ip link | grep 'link\/ether' | head -1)
-		ETHER_ADDR=$2
-	# 2. net-tools: MAC varies by implementation
-	#    `ether`  (net-tools 2.x, FreeBSD, macOS),
-	#    `HWaddr` (old net-tools, busybox),
-	#    `lladdr` (OpenBSD).
-	#  -> grab the first token of exactly six 2-hex-digit groups.
-	#     No valid IPv6 address has that shape (it needs 8 groups
-	#     or a `::`), so a MAC is the only thing this can match.
-	elif command -v ifconfig > /dev/null 2>&1 ; then
-		hh='[0-9a-fA-F][0-9a-fA-F]'
-		for word in $(ifconfig 2>/dev/null); do
-			case $word in
-			$hh:$hh:$hh:$hh:$hh:$hh) ETHER_ADDR=$word; break;;
-			esac
-		done
+	# We get the MAC address of the probe's interface, in a way that's not
+	# dependent on net-tools or iproute2, but it is Linux-specific!
+
+	# Get default-route iface, not merely the first one
+	dev=
+	# v4-only
+	while read -r iface dest gw flags refcnt use metric mask rest ; do
+		if [ "$dest" = "00000000" ] && [ "$mask" = "00000000" ] ; then
+			dev=$iface ; break
+		fi
+	done < /proc/net/route
+	# if v4 failed, v6-only
+	if [ -z "$dev" ] && [ -r /proc/net/ipv6_route ] ; then
+		while read -r dest plen snet splen nhop metric refcnt use flags iface ; do
+			if [ "$dest" = "00000000000000000000000000000000" ] && [ "$plen" = "00" ] && [ "$iface" != "lo" ] ; then
+				dev=$iface ; break
+			fi
+		done < /proc/net/ipv6_route
 	fi
+	ETHER_ADDR=`cat "/sys/class/net/$dev/address" 2>/dev/null`
 	export ETHER_ADDR
 	ETHER_SCANNED=`echo $ETHER_ADDR | sed -e s/\://g`; export ETHER_SCANNED
 }
