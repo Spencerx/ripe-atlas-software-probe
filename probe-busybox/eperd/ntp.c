@@ -893,27 +893,31 @@ printf("%s, %d: sin6_family = %d\n", __FILE__, __LINE__, state->sin6.sin6_family
 	snprintf(line, sizeof(line), ", " DBQ(final-ts) ": %.9f", d);
 	add_str(state, line);
 
-	/* Compute rtt */
-	d= final_ts.ntp_seconds - ntohl(ntphdr->ntp_origin_ts.ntp_seconds) -
-		(ntohl(ntphdr->ntp_transmit_ts.ntp_seconds) -
-		ntohl(ntphdr->ntp_receive_ts.ntp_seconds)) +
-		final_ts.ntp_fraction/NTP_4G -
-		ntohl(ntphdr->ntp_origin_ts.ntp_fraction)/NTP_4G -
-		(ntohl(ntphdr->ntp_transmit_ts.ntp_fraction)/NTP_4G -
-		ntohl(ntphdr->ntp_receive_ts.ntp_fraction)/NTP_4G);
-	snprintf(line, sizeof(line), ", " DBQ(rtt) ": %f", d);
-	add_str(state, line);
+	/* NTP RFC 5905
+	 * 7.3 page 18 - table with T1/T2/T3/T4
+	 * 8   page 29 gives theta (offset) and delta (rtt) math
+	 * T1 = origin (client send)  T2 = receive (server)
+	 * T3 = transmit (server)     T4 = final (client receive) */
+	{
+		uint64_t t1= ((uint64_t)ntohl(ntphdr->ntp_origin_ts.ntp_seconds) << 32) |
+			ntohl(ntphdr->ntp_origin_ts.ntp_fraction);
+		uint64_t t2= ((uint64_t)ntohl(ntphdr->ntp_receive_ts.ntp_seconds) << 32) |
+			ntohl(ntphdr->ntp_receive_ts.ntp_fraction);
+		uint64_t t3= ((uint64_t)ntohl(ntphdr->ntp_transmit_ts.ntp_seconds) << 32) |
+			ntohl(ntphdr->ntp_transmit_ts.ntp_fraction);
+		uint64_t t4= ((uint64_t)final_ts.ntp_seconds << 32) |
+			final_ts.ntp_fraction;
 
-	d= (ntohl(ntphdr->ntp_origin_ts.ntp_seconds) -
-		final_ts.ntp_seconds)/2.0 +
-		(ntohl(ntphdr->ntp_receive_ts.ntp_seconds) -
-		ntohl(ntphdr->ntp_transmit_ts.ntp_seconds))/2.0 -
-		(ntohl(ntphdr->ntp_origin_ts.ntp_fraction)/NTP_4G -
-		final_ts.ntp_fraction/NTP_4G)/2.0 +
-		(ntohl(ntphdr->ntp_receive_ts.ntp_fraction)/NTP_4G -
-		ntohl(ntphdr->ntp_transmit_ts.ntp_fraction)/NTP_4G)/2.0;
-	snprintf(line, sizeof(line), ", " DBQ(offset) ": %f", d);
-	add_str(state, line);
+		/* round-trip delay: (T4 - T1) - (T3 - T2) */
+		d= ((int64_t)(t4 - t1) - (int64_t)(t3 - t2)) / NTP_4G;
+		snprintf(line, sizeof(line), ", " DBQ(rtt) ": %f", d);
+		add_str(state, line);
+
+		/* clock offset: ((T2 - T1) + (T3 - T4)) / 2 */
+		d= ((int64_t)(t2 - t1) + (int64_t)(t3 - t4)) / 2.0 / NTP_4G;
+		snprintf(line, sizeof(line), ", " DBQ(offset) ": %f", d);
+		add_str(state, line);
+	}
 
 	state->open_result= 1;
 
