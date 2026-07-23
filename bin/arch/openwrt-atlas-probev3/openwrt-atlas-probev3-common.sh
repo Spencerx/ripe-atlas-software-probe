@@ -1,4 +1,5 @@
 # Files
+MODE_FILE=/mnt/oldroot/home/atlas/state/mode
 LEDS_KERNEL='tp-link:green:3g'
 LEDS_FIRMWARE='tp-link:green:wlan'
 LEDS_NETWORK='tp-link:green:lan'

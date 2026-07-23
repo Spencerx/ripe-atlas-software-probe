@@ -6,6 +6,7 @@ BIN_DIR=$WRT_PROBE_SCRIPTS_DIR/bin
 ATLASINIT=$BB_BIN_DIR/atlasinit; export REG_INIT_BIN
 KNOWN_HOSTS_REG=$WRT_ETC_DIR/known_hosts.reg
 REG_SERVERS=$BASE_DIR/bin/reg_servers.sh
+MODE_FILE=$BASE_DIR/state/mode
 
 # Commands
 SET_LEDS_CMD=log_status

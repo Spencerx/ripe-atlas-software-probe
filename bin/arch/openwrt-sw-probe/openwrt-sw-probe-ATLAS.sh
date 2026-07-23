@@ -32,7 +32,6 @@ telnetd()
 : ${HOME:=/usr/libexec/atlas-probe-scripts}; export HOME	# Set HOME if it isn't set
 
 RESOLV_CONF=/etc/resolv.conf
-MODE_FILE=$BASE_DIR/state/mode
 
 # Other conf
 DHCP=False

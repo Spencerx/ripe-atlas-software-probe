@@ -12,7 +12,6 @@ SET_DATE_FROM_CURRENTTIME_TXT=set_date_from_currenttime_txt
 
 # Various files and directories
 DEV_FIRMWARE=/storage/etc/openwrt-ar71xx-atlas-rootfs.tar; export DEV_FIRMWARE
-MODE_FILE=/mnt/oldroot/home/atlas/state/mode
 KEY_PREFIX_SOURCE=$BASE_DIR/etc/2017-11-07
 
 . /home/atlas/bin/arch/openwrt/openwrt-common.sh

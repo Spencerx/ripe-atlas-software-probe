@@ -12,7 +12,6 @@ SET_DATE_FROM_CURRENTTIME_TXT=set_date_from_currenttime_txt
 
 # Various files and directories
 DEV_FIRMWARE=/storage/etc/openwrt-sunxi-cortexa53-atlas-rootfs.tar; export DEV_FIRMWARE
-MODE_FILE=/home/atlas/state/mode
 KEY_PREFIX_SOURCE=$BASE_DIR/etc/2018-04-23
 
 . /home/atlas/bin/arch/openwrt/openwrt-common.sh

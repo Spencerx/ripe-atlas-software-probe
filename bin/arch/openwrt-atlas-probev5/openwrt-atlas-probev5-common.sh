@@ -1,6 +1,7 @@
 # Files
-# Commands
+MODE_FILE=/home/atlas/state/mode
 
+# Commands
 SET_LEDS_CMD=set_leds_mox
 BUDDYINFO=do_buddyinfo
 MOUNT_ROOT_RO=mount_root_ro
