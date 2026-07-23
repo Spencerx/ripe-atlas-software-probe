@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ripe-atlas-probe
-PKG_VERSION:=$(shell cat $(CURDIR)/$(SOURCE)/../VERSION)
+PKG_VERSION:=$(shell cat $(CURDIR)/../VERSION)
 PKG_RELEASE:=1
 PKG_LICENSE:=GPL
 PKG_LICENSE_FILES:=LICENSE
@@ -46,7 +46,8 @@ CONFIGURE_ARGS+= \
 ########### GENERIC ###########
 
 define Build/Prepare
-	$(CP) $(patsubst %/openwrt,%,$(TOPDIR)/$(SOURCE))/. $(PKG_BUILD_DIR)
+	# Copy whole repo (dir above openwrt/) into build dir (22.03 & 25.12)
+	$(CP) $(patsubst %/openwrt,%,$(CURDIR))/. $(PKG_BUILD_DIR)
 endef
 
 define LinkApplet
