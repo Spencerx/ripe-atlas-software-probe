@@ -124,6 +124,19 @@ kill_telnetd()
 		kill -9 `tail -1 $STATUS_DIR/telnetd-port$TELNETD_PORT-pid.vol` 2>/dev/null
 	fi
 }
+get_sos_server()
+{
+	sos_env=$(cat "$MODE_FILE" 2>/dev/null)
+	case X$sos_env in
+	Xdev|Xtest|Xprod)
+	;;
+	*)
+		# Failover
+		sos_env=prod
+	;;
+	esac
+	echo "sos.$sos_env.atlas.ripe.net"
+}
 sos()
 {
 	## sos
@@ -131,7 +144,7 @@ sos()
 	INFO="$1"
 	CLOCK="$(date '+%s')"
 	if [ -n "$INFO" ]; then INFO="$INFO".; fi
-	evping -e -c 2 "${INFO}C${CLOCK}.U$UPTIME.M$ETHER_SCANNED.sos.atlas.ripe.net"
+	evping -e -c 2 "${INFO}C${CLOCK}.U$UPTIME.M$ETHER_SCANNED.$(get_sos_server)"
 }
 ssh()
 {
