@@ -7,7 +7,7 @@
   - Update probe registration links from apply -> register
   - Update regservers for dev/test
 
-* Thu Jul 1 2026 RIPE Atlas Team <atlas@ripe.net> - 5121
+* Wed Jul 1 2026 RIPE Atlas Team <atlas@ripe.net> - 5121
 - All platforms
   - Fix unknown architectures causing registration failure
   - Remove unused architectures and files (debian-sw-probe, openwrt-sw-probe, stale Dockerfile)
