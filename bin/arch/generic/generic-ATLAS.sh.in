@@ -30,7 +30,6 @@ telnetd()
 # Various files and directories
 : ${HOME:=${ATLAS_SPOOLDIR}}; export HOME	# Set HOME if it isn't set
 RESOLV_CONF=@sysconfdir@/resolv.conf
-MODE_FILE=$ATLAS_SYSCONFDIR/mode
 
 # Other conf
 DHCP=False
