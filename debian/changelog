@@ -1,6 +1,20 @@
 ripe-atlas-software-probe (5123) trixie bookworm bullseye; urgency=medium
 
-  * TODO (See MR text...)
+  * All platforms
+    - NTP: add a minimum gap between requests (default 4000 ms, bounds 2000-60000 ms) to rate-limit multi-packet measurements; the gap is skipped when replaying recorded responses (as used by the test suite)
+    - NTP: send the "RIPE" reference-id in network byte order so it is correct on big-endian as well as little-endian architectures
+    - NTP: remove dead code and a duplicate definition
+    - Also support iproute2 (ip) for interface listing and MAC lookup, with net-tools (ifconfig) as a fallback, so probes work with either one installed
+  * Software Probes
+    - Depend on iproute2 OR net-tools for the official packages
+    - RHEL: add libcap as an explicit dependency
+    - RHEL: apply the systemd build dependency to all EL versions (previously EL7/EL8 only) and correct the EL8+ spec dependencies
+    - Update the registration servers for production
+  * CI
+    - Add a probe-busybox testsuite job and a manual build job, and rename the lint stage to test
+  * Other
+    - Fix a missing header include in scripts/echo.c
+    - Clarify the anchor package purpose in BUILD.md
 
  -- RIPE Atlas Team <atlas@ripe.net>  Mon, 13 Jul 2026 00:00:00 +0000
 
