@@ -1,4 +1,11 @@
 %changelog
+* Thu Jul 23 2026 RIPE Atlas Team <atlas@ripe.net> - 5124
+- All platforms
+  - Fix the NTP measurement offset: it reported roughly half the round-trip time instead of the clock offset. The RFC 5905 offset and delay are now computed in 64-bit fixed point, giving correct values for positive and negative offsets (reported by Marco Davids <marco.davids@sidn.nl>)
+  - Fix get_ether_addr() selecting a non-default interface (for example a bridge or docker interface): the MAC of the default-route interface is now used, read directly from the kernel (/proc, /sys) so it no longer depends on iproute2 or net-tools
+- Anchors
+  - Fix the missing production registration-server host keys (reg-07/reg-08) in the anchor known_hosts, which prevented anchors from registering in production
+
 * Mon Jul 13 2026 RIPE Atlas Team <atlas@ripe.net> - 5123
 - All platforms
   - NTP: add a minimum gap between requests (default 4000 ms, bounds 2000-60000 ms) to rate-limit multi-packet measurements; the gap is skipped when replaying recorded responses (as used by the test suite)
