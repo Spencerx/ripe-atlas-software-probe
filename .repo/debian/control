@@ -6,8 +6,6 @@ Build-Depends:
  autotools-dev,
  libssl-dev,
  gpg,
-Depends:
- ca-certificates,
 Rules-Requires-Root: binary-targets
 Maintainer: RIPE Atlas Team <atlas@ripe.net>
 Uploaders: Trix Taiclet <ttaiclet@ripe.net>,
@@ -17,6 +15,9 @@ Package: ripe-atlas-repo
 Architecture: all
 Section: net
 Priority: optional
+Depends:
+ ca-certificates,
+ ${misc:Depends},
 Homepage: https://atlas.ripe.net/
 Description: RIPE Atlas repository specific files and configuration.
  RIPE Atlas is the RIPE NCC's main Internet data collection system.
