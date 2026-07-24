@@ -91,7 +91,7 @@ autoreconf -iv
     --disable-chown \
     --disable-setcap-install \
     --with-install-mode=anchor
-make
+%make_build
 
 
 %install
