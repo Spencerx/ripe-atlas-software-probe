@@ -4,6 +4,8 @@ ripe-atlas-repo (1.5-6) trixie bookworm bullseye; urgency=medium
   * Scope the signing key to this repository via Signed-By, shipping it in
     /usr/share/keyrings instead of the globally trusted /etc/apt/trusted.gpg.d
   * Remove the obsolete .list and trusted.gpg.d key conffiles on upgrade
+  * Declare ca-certificates as a binary package dependency (was silently
+    dropped from the source stanza)
 
  -- RIPE Atlas Team <atlas@ripe.net>  Mon, 15 Jun 2026 00:00:00 +0000
 

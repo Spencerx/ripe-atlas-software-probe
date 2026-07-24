@@ -1,4 +1,12 @@
 %changelog
+* Mon Jun 15 2026 RIPE Atlas Team <atlas@ripe.net> - 1.5-6
+- Debian: move apt source from the legacy .list to the deb822 .sources format
+- Debian: scope the signing key to this repository via Signed-By, shipping it in
+  /usr/share/keyrings instead of the globally trusted /etc/apt/trusted.gpg.d
+- Debian: remove the obsolete .list and trusted.gpg.d key conffiles on upgrade
+- Debian: declare ca-certificates as a binary package dependency (was silently
+  dropped from the source stanza)
+
 * Mon Oct 27 2025 RIPE Atlas Team <atlas@ripe.net> - 1.5-5
 - Improve branch/tag handling and add comments in ripe-atlas-repo.spec
 
