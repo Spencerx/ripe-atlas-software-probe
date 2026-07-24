@@ -107,9 +107,12 @@ _ri_parse()
 	while read param; do
 		if [ "${param%% *}" = "${key}" ]; then
 			echo "${param}"
-			break
+			return 0
 		fi
 	done < "${RI_REPLY}"
+
+	# Key is not in the reply
+	return 1
 }
 
 # Get network configuration for given key ($1)
