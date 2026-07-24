@@ -183,6 +183,8 @@ define Package/ripe-atlas-probe
 	$(call Package/ripe-atlas/Default)
 	TITLE+=(Software Probe)
 	DEPENDS+=+ripe-atlas-common
+	CONFLICTS:=ripe-atlas-hwprobe \
+	           ripe-atlas-anchor
 	MENU:=1
 endef
 
@@ -225,6 +227,8 @@ define Package/ripe-atlas-hwprobe
 		+ripe-atlas-common \
 		+openssl-util
 	PROVIDES+=ripe-atlas-probe
+	CONFLICTS:=ripe-atlas-probe \
+	           ripe-atlas-anchor
 	MENU:=1
 endef
 
@@ -262,6 +266,8 @@ define Package/ripe-atlas-anchor
 	TITLE+=(Anchor)
 	DEPENDS+=+ripe-atlas-common
 	PROVIDES+=ripe-atlas-probe
+	CONFLICTS:=ripe-atlas-probe \
+	           ripe-atlas-hwprobe
 	MENU:=1
 endef
 
