@@ -17,7 +17,7 @@ _wrt_syscall()
 		shift
 	done
 
-	ubus call hotplug.ripe-atlas call "{ \"env\": [ ${env:2} ] }"
+	ubus call hotplug.ripe-atlas call "{ \"env\": [ ${env#, } ] }"
 }
 
 _map_key_to_netconfig_file()
@@ -100,7 +100,7 @@ _ri_parse()
 {
 	local key="${1}"
 
-	if [ ! -r "${RI_REPLY}" ] || [ "$(wc -c < "${RI_REPLY}")" == 0 ]; then
+	if [ ! -r "${RI_REPLY}" ] || [ "$(wc -c < "${RI_REPLY}")" = 0 ]; then
 		return 1
 	fi
 
@@ -161,13 +161,13 @@ _handle_dns()
 	# First is the name DNS_SERVERS
 	shift
 	while [ -n "${1}" ]; do
-		if [ "${1//${filter}/}" != "${1}" ]; then
-			res="${res} ${1}"
-		fi
+		case "${1}" in
+			*"${filter}"*) res="${res} ${1}" ;;
+		esac
 		shift
 	done
 
-	echo "${res:1}"
+	echo "${res# }"
 }
 
 set_ipv4()

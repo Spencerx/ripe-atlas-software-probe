@@ -45,9 +45,9 @@ _get_usb_id()
 	set -- $(readlink /sys/block/${blockdev})
 	IFS="${oldifs}"
 	while [ -n "${1}" ]; do
-		if [ "${1:0:3}" = 'usb' ]; then
-			break
-		fi
+		case "${1}" in
+			usb*) break ;;
+		esac
 		shift
 	done
 	if [ -n "${1}" ]; then
@@ -113,7 +113,7 @@ p_to_r_init()
 	fi
 	answer="${answer}\nREASON_FOR_REGISTRATION ${reason}\n"
 
-	echo -e "${answer}" | tee ${P_TO_R_INIT_IN}
+	printf '%b\n' "${answer}" | tee ${P_TO_R_INIT_IN}
 }
 
 hwprobe_ssh()
