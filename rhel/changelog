@@ -1,8 +1,9 @@
 %changelog
-* Thu Jul 23 2026 RIPE Atlas Team <atlas@ripe.net> - 5124
+* Wed Jul 29 2026 RIPE Atlas Team <atlas@ripe.net> - 5124
 - All platforms
   - Fix NTP measurement offset: a regression from the 5120 fix, it reported half the round-trip time instead of the clock offset. The RFC 5905 offset and delay are now computed in 64-bit fixed point, giving correct values for positive and negative offsets (GH-130)
   - Fix get_ether_addr() selecting a non-default interface (for example a bridge or docker interface): the MAC of the default-route interface is now used, read directly from the kernel (/proc, /sys) so it no longer depends on iproute2 or net-tools
+  - Use environment-specific SOS servers for SOS calls (used by non-functional probes, or as basic login measurement)
 - Software Probes
   - OpenWrt: fix the 'openwrt/' package build (Build/Prepare) failing on OpenWrt 24.10/25.12 (GH-146)
   - OpenWrt: mark the probe, hwprobe and anchor packages as conflicting again, only one can be installed
