@@ -9,7 +9,7 @@ Build-Depends:
 Rules-Requires-Root: binary-targets
 Maintainer: RIPE Atlas Team <atlas@ripe.net>
 Uploaders: Trix Taiclet <ttaiclet@ripe.net>,
-           Marios Mavropoulos <mmavropoulos@ripe.net>
+           Robert Klink <rklink@ripe.net>
 
 Package: ripe-atlas-repo
 Architecture: all
