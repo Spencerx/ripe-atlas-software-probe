@@ -9,6 +9,8 @@ ripe-atlas-software-probe (5124) trixie bookworm bullseye; urgency=medium
     - OpenWrt: mark the probe, hwprobe and anchor packages as conflicting again, only one can be installed
   * Anchors
     - Fix the missing production registration-server host keys (reg-07/reg-08) in the anchor known_hosts, which prevented anchors from registering in production
+  * Other
+    - Wrap the over-long FEATURE_EVTDIG_DEBUG help line in evtdig (authored by Alexandru Ardelean <alex@shruggie.ro>)
 
  -- RIPE Atlas Team <atlas@ripe.net>  Wed, 29 Jul 2026 00:00:00 +0000
 
