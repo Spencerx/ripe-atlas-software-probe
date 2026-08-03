@@ -1,6 +1,6 @@
 FROM debian:11
 
-MAINTAINER mstam@ripe.net
+LABEL org.opencontainers.image.authors="RIPE Atlas Team <atlas@ripe.net>"
 
 RUN apt-get update && \
     apt-get install -y libssl-dev build-essential autoconf debhelper gpg lsb-release systemd ca-certificates

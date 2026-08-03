@@ -1,6 +1,6 @@
 FROM oraclelinux:8
 
-MAINTAINER mmavropoulos@ripe.net
+LABEL org.opencontainers.image.authors="RIPE Atlas Team <atlas@ripe.net>"
 
 RUN dnf -y update
 
