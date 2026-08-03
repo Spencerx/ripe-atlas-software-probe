@@ -1,41 +1,13 @@
 %changelog
-* Wed Jul 29 2026 RIPE Atlas Team <atlas@ripe.net> - 5124
+* Wed Aug 5 2026 RIPE Atlas Team <atlas@ripe.net> - 5130
 - All platforms
   - Fix NTP measurement offset: a regression from the 5120 fix, it reported half the round-trip time instead of the clock offset. The RFC 5905 offset and delay are now computed in 64-bit fixed point, giving correct values for positive and negative offsets (GH-130)
-  - Fix get_ether_addr() selecting a non-default interface (for example a bridge or docker interface): the MAC of the default-route interface is now used, read directly from the kernel (/proc, /sys) so it no longer depends on iproute2 or net-tools
-  - Use environment-specific SOS servers for SOS calls (used by non-functional probes, or as basic login measurement)
-- Software Probes
-  - OpenWrt: fix the 'openwrt/' package build (Build/Prepare) failing on OpenWrt 24.10/25.12 (GH-146)
-  - OpenWrt: mark the probe, hwprobe and anchor packages as conflicting again, only one can be installed
-- Anchors
-  - Fix the missing production registration-server host keys (reg-07/reg-08) in the anchor known_hosts, which prevented anchors from registering in production
-- Other
-  - Wrap the over-long FEATURE_EVTDIG_DEBUG help line in evtdig (authored by Alexandru Ardelean <alex@shruggie.ro>)
-
-* Mon Jul 13 2026 RIPE Atlas Team <atlas@ripe.net> - 5123
-- All platforms
   - NTP: add a minimum gap between requests (default 4000 ms, bounds 2000-60000 ms) to rate-limit multi-packet measurements; the gap is skipped when replaying recorded responses (as used by the test suite) (GH-114)
   - NTP: send the "RIPE" reference-id in network byte order so it is correct on big-endian as well as little-endian architectures
   - NTP: remove dead code and a duplicate definition
-  - Also support iproute2 (ip) for interface listing and MAC lookup, with net-tools (ifconfig) as a fallback, so probes work with either one installed (reported by Paul Menzel <pmenzel@molgen.mpg.de>, GH-147, GH-148)
-- Software Probes
-  - Depend on iproute2 OR net-tools for the official packages
-  - RHEL: add libcap as an explicit dependency
-  - RHEL: apply the systemd build dependency to all EL versions (previously EL7/EL8 only) and correct the EL8+ spec dependencies
-  - Update the registration servers for production
-- CI
-  - Add a probe-busybox testsuite job and a manual build job, and rename the lint stage to test
-- Other
-  - Fix a missing header include in scripts/echo.c
-  - Clarify the anchor package purpose in BUILD.md
-
-* Mon Jul 6 2026 RIPE Atlas Team <atlas@ripe.net> - 5122
-- Software Probes
-  - Update probe registration links from apply -> register
-  - Update regservers for dev/test
-
-* Wed Jul 1 2026 RIPE Atlas Team <atlas@ripe.net> - 5121
-- All platforms
+  - Fix get_ether_addr() selecting a non-default interface (for example a bridge or docker interface): the MAC of the default-route interface is now used, read directly from the kernel (/proc, /sys) so it no longer depends on iproute2 or net-tools
+  - Also support iproute2 (ip) for interface listing, with net-tools (ifconfig) as a fallback, so probes work with either one installed (reported by Paul Menzel <pmenzel@molgen.mpg.de>, GH-147, GH-148)
+  - Use environment-specific SOS servers for SOS calls (used by non-functional probes, or as basic login measurement)
   - Fix unknown architectures causing registration bugs
   - Remove unused architectures and files (debian-sw-probe, turris-sw-probe, stale Dockerfile)
 - Hardware Probes
@@ -43,19 +15,32 @@
   - Next-generation firmware uses a common base instead of a split-base approach
   - Easier debugging of update files with additional checksum printing
   - Fix bug in reginit for APP upgrade
+  - Parse the saved static network configuration (the atlasinit-generated netconfig files), so a hardware probe can boot without a reginit reply
 - Software Probes
   - Change default SSH key pair algo to ed25519 for Debian and EL
   - Include the probe's public key in the registration URL shown after installation, so it is pre-filled when registering
   - Improve the post-install registration information: clearer and color text
+  - Update probe registration links from apply -> register
+  - Update the registration servers for dev, test and production, with ed25519 keys
+  - Depend on iproute2 OR net-tools for the official packages
+  - OpenWrt: fix the 'openwrt/' package build (Build/Prepare) failing on OpenWrt 24.10/25.12 (GH-146)
+  - OpenWrt: mark the probe, hwprobe and anchor packages as conflicting again, only one can be installed
+  - RHEL: add libcap as an explicit dependency
+  - RHEL: apply the systemd build dependency to all EL versions (previously EL7/EL8 only) and correct the EL8+ spec dependencies
+  - Replace the RHEL spec rpm build commands with modern rpm macros
+  - OpenWrt: don't reset the mode, config file and registration servers on every service start, only when the configuration changes
   - Add libssl3t64 for Debian 13 (authored by Dreista <Dreista@users.noreply.github.com>)
   - Improve the Debian maintainer scripts: detect systemd gracefully and only call systemctl when systemd is in use, drop hardcoded paths (systemd-sysusers), and detect Debian 12+ instead of 12
   - Fix the changelog in the Debian packages being trimmed on Debian 12+, which broke apt changelog
-  - Replace the RHEL spec rpm build commands with modern rpm macros
-  - OpenWrt: don't reset the mode, config file and registration servers on every service start, only when the configuration changes
+  - Update the uploaders in the Debian package control files
 - CI
   - Add basic testing of package installation
+  - Add a probe-busybox testsuite job and a manual build job, and rename the lint stage to test
 - Other
   - Fix typo in HTTP_POST_PORT configuration entry (authored by Grant Slater <github@firefishy.com>)
+  - Wrap the over-long FEATURE_EVTDIG_DEBUG help line in evtdig (authored by Alexandru Ardelean <alex@shruggie.ro>)
+  - Fix a missing header include in scripts/echo.c
+  - Clarify the anchor package purpose in BUILD.md
 
 * Mon Oct 27 2025 RIPE Atlas Team <atlas@ripe.net> - 5120
 - All platforms

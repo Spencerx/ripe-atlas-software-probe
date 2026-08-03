@@ -1,6 +1,50 @@
 Release History
 ===============
 
+5130 (released 2026-08-05)
+--------------------------
+- All platforms
+  * Fix NTP measurement offset: a regression from the 5120 fix, it reported half the round-trip time instead of the clock offset. The RFC 5905 offset and delay are now computed in 64-bit fixed point, giving correct values for positive and negative offsets (GH-130)
+  * NTP: add a minimum gap between requests (default 4000 ms, bounds 2000-60000 ms) to rate-limit multi-packet measurements; the gap is skipped when replaying recorded responses (as used by the test suite) (GH-114)
+  * NTP: send the "RIPE" reference-id in network byte order so it is correct on big-endian as well as little-endian architectures
+  * NTP: remove dead code and a duplicate definition
+  * Fix get_ether_addr() selecting a non-default interface (for example a bridge or docker interface): the MAC of the default-route interface is now used, read directly from the kernel (/proc, /sys) so it no longer depends on iproute2 or net-tools
+  * Also support iproute2 (ip) for interface listing, with net-tools (ifconfig) as a fallback, so probes work with either one installed (reported by Paul Menzel <pmenzel@molgen.mpg.de>, GH-147, GH-148)
+  * Use environment-specific SOS servers for SOS calls (used by non-functional probes, or as basic login measurement)
+  * Fix unknown architectures causing registration bugs
+  * Remove unused architectures and files (debian-sw-probe, turris-sw-probe, stale Dockerfile)
+- Hardware Probes
+  * Addition of the ``openwrt-hwprobe`` architecture, allowing for the next-generation firmware on existing hardware probes
+  * Next-generation firmware uses a common base instead of a split-base approach
+  * Easier debugging of update files with additional checksum printing
+  * Fix bug in reginit for APP upgrade
+  * Parse the saved static network configuration (the atlasinit-generated netconfig files), so a hardware probe can boot without a reginit reply
+- Software Probes
+  * Change default SSH key pair algo to ed25519 for Debian and EL
+  * Include the probe's public key in the registration URL shown after installation, so it is pre-filled when registering
+  * Improve the post-install registration information: clearer and color text
+  * Update probe registration links from apply -> register
+  * Update the registration servers for dev, test and production, with ed25519 keys
+  * Depend on iproute2 OR net-tools for the official packages
+  * OpenWrt: fix the ``openwrt/`` package build (Build/Prepare) failing on OpenWrt 24.10/25.12 (GH-146)
+  * OpenWrt: mark the probe, hwprobe and anchor packages as conflicting again, only one can be installed
+  * RHEL: add libcap as an explicit dependency
+  * RHEL: apply the systemd build dependency to all EL versions (previously EL7/EL8 only) and correct the EL8+ spec dependencies
+  * Replace the RHEL spec rpm build commands with modern rpm macros
+  * OpenWrt: don't reset the mode, config file and registration servers on every service start, only when the configuration changes
+  * Add libssl3t64 for Debian 13 (authored by Dreista <Dreista@users.noreply.github.com>)
+  * Improve the Debian maintainer scripts: detect systemd gracefully and only call systemctl when systemd is in use, drop hardcoded paths (systemd-sysusers), and detect Debian 12+ instead of 12
+  * Fix the changelog in the Debian packages being trimmed on Debian 12+, which broke apt changelog
+  * Update the uploaders in the Debian package control files
+- CI
+  * Add basic testing of package installation
+  * Add a probe-busybox testsuite job and a manual build job, and rename the lint stage to test
+- Other
+  * Fix typo in HTTP_POST_PORT configuration entry (authored by Grant Slater <github@firefishy.com>)
+  * Wrap the over-long FEATURE_EVTDIG_DEBUG help line in evtdig (authored by Alexandru Ardelean <alex@shruggie.ro>)
+  * Fix a missing header include in scripts/echo.c
+  * Clarify the anchor package purpose in BUILD.md
+
 5120 (released 2025-10-27)
 --------------------------
 - All platforms

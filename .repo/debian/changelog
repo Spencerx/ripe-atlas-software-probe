@@ -6,8 +6,11 @@ ripe-atlas-repo (1.5-6) trixie bookworm bullseye; urgency=medium
   * Remove the obsolete .list and trusted.gpg.d key conffiles on upgrade
   * Declare ca-certificates as a binary package dependency (was silently
     dropped from the source stanza)
+  * Stop the packaged changelog being trimmed on Debian 12+, keeping
+    apt changelog working
+  * Update the uploaders in the control file
 
- -- RIPE Atlas Team <atlas@ripe.net>  Mon, 15 Jun 2026 00:00:00 +0000
+ -- RIPE Atlas Team <atlas@ripe.net>  Wed, 05 Aug 2026 00:00:00 +0000
 
 ripe-atlas-repo (1.5-5) trixie bookworm bullseye; urgency=medium
 
