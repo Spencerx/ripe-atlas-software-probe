@@ -1,4 +1,4 @@
-ripe-atlas-repo (1.5-6) trixie bookworm bullseye; urgency=medium
+ripe-atlas-repo (1.6-1) trixie bookworm bullseye; urgency=medium
 
   * Move apt source from the legacy .list to the deb822 .sources format
   * Scope the signing key to this repository via Signed-By, shipping it in
