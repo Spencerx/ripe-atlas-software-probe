@@ -6,7 +6,7 @@ stages:
   - commit
 
 variables:
-  DOCKER_IMAGE_HELPER: ${DOCKER_IMAGE_HELPER_TAGLESS}:v2.0.0
+  DOCKER_IMAGE_HELPER: ${DOCKER_IMAGE_HELPER_TAGLESS}:v2.1.0
 
 build_image:
   stage: docker_image
